@@ -1,0 +1,1821 @@
+Directory structure:
+└── studsluzba-client/
+    ├── pom.xml
+    └── src/
+        └── main/
+            ├── java/
+            │   └── org/
+            │       └── raflab/
+            │           └── studsluzba/
+            │               └── client/
+            │                   ├── JavaFxApplication.java
+            │                   ├── StudsluzbaClientApp.java
+            │                   ├── config/
+            │                   │   └── StageInitializer.java
+            │                   ├── controllers/
+            │                   │   ├── MainController.java
+            │                   │   ├── StudentProfileController.java
+            │                   │   └── StudentSearchController.java
+            │                   ├── core/
+            │                   │   └── NavigationManager.java
+            │                   ├── dto/
+            │                   │   ├── KursnaListaResponseDTO.java
+            │                   │   ├── NastavnikOsnovnoDTO.java
+            │                   │   ├── PredmetDTO.java
+            │                   │   ├── SifarnikItemDTO.java
+            │                   │   ├── ispit/
+            │                   │   │   ├── request/
+            │                   │   │   │   ├── CreateIspitRequestDTO.java
+            │                   │   │   │   ├── EvidencijaIzlaskaRequestDTO.java
+            │                   │   │   │   └── PrijavaIspitaRequestDTO.java
+            │                   │   │   └── response/
+            │                   │   │       ├── IspitniRokResponseDTO.java
+            │                   │   │       ├── IspitResponseDTO.java
+            │                   │   │       ├── IspitRezultatResponseDTO.java
+            │                   │   │       └── PrijavljeniStudentResponseDTO.java
+            │                   │   ├── kurikulum/
+            │                   │   │   ├── request/
+            │                   │   │   │   ├── CreatePredispitnaObavezaRequestDTO.java
+            │                   │   │   │   └── CreatePredmetRequestDTO.java
+            │                   │   │   └── response/
+            │                   │   │       ├── PredispitnaObavezaResponseDTO.java
+            │                   │   │       ├── PredmetDetaljiResponseDTO.java
+            │                   │   │       └── StudijskiProgramResponseDTO.java
+            │                   │   ├── nastavnik/
+            │                   │   │   ├── request/
+            │                   │   │   │   ├── CreateNastavnikRequestDTO.java
+            │                   │   │   │   ├── DodajObrazovanjeRequestDTO.java
+            │                   │   │   │   └── DodajZvanjeRequestDTO.java
+            │                   │   │   └── response/
+            │                   │   │       ├── NastavnikProfileResponseDTO.java
+            │                   │   │       ├── ObrazovanjeResponseDTO.java
+            │                   │   │       └── ZvanjeResponseDTO.java
+            │                   │   ├── sifarnik/
+            │                   │   │   ├── request/
+            │                   │   │   │   ├── CreateSrednjaSkolaRequestDTO.java
+            │                   │   │   │   └── CreateVisokoskolskaUstanovaRequestDTO.java
+            │                   │   │   └── response/
+            │                   │   │       ├── SrednjaSkolaResponseDTO.java
+            │                   │   │       └── VisokoskolskaUstanovaResponseDTO.java
+            │                   │   ├── skolskagodina/
+            │                   │   │   ├── request/
+            │                   │   │   │   └── CreateSkolskaGodinaRequestDTO.java
+            │                   │   │   └── response/
+            │                   │   │       └── SkolskaGodinaResponseDTO.java
+            │                   │   └── student/
+            │                   │       ├── request/
+            │                   │       │   ├── CreateStudentRequestDTO.java
+            │                   │       │   ├── CreateUplataRequestDTO.java
+            │                   │       │   ├── ObnovaGodineRequestDTO.java
+            │                   │       │   └── UpisGodineRequestDTO.java
+            │                   │       └── response/
+            │                   │           ├── PolozenIspitResponseDTO.java
+            │                   │           ├── StanjeFinansijaResponseDTO.java
+            │                   │           ├── StudentProfileResponseDTO.java
+            │                   │           └── UpisanaGodinaResponseDTO.java
+            │                   ├── service/
+            │                   │   └── ApiClient.java
+            │                   └── utils/
+            │                       └── SpringFXMLLoader.java
+            └── resources/
+                ├── application.properties
+                └── fxml/
+                    ├── MainLayout.fxml
+                    ├── StudentProfile.fxml
+                    ├── StudentSearch.fxml
+                    └── Welcome.fxml
+
+================================================
+FILE: pom.xml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.raflab</groupId>
+    <artifactId>studsluzba-client</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>17</java.version>
+        <javafx.version>21</javafx.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Osnova -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- WebClient (za komunikaciju sa serverom) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- JavaFX Kontrole -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- JavaFX FXML -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Jackson (JSON) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- FIX ZA MACOS (M1/M2/M3) - Rešava Netty DNS grešku -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/JavaFxApplication.java
+================================================
+package org.raflab.studsluzba.client;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ConfigurableApplicationContext;
+
+public class JavaFxApplication extends Application {
+    private ConfigurableApplicationContext context;
+
+    @Override
+    public void init() {
+        // Pokrećemo Spring kontekst pre nego što se GUI prikaže
+        context = new SpringApplicationBuilder(StudsluzbaClientApp.class).run();
+    }
+
+    @Override
+    public void start(Stage stage) {
+        // Obaveštavamo Spring da je Stage (prozor) spreman
+        context.publishEvent(new StageReadyEvent(stage));
+    }
+
+    @Override
+    public void stop() {
+        // Gašenje Spring konteksta kad se zatvori prozor
+        context.close();
+        Platform.exit();
+    }
+
+    // Event koji nosi Stage objekat
+    public static class StageReadyEvent extends ApplicationEvent {
+        public Stage getStage() {
+            return (Stage) getSource();
+        }
+
+        public StageReadyEvent(Stage stage) {
+            super(stage);
+        }
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/StudsluzbaClientApp.java
+================================================
+package org.raflab.studsluzba.client;
+
+import javafx.application.Application;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class StudsluzbaClientApp {
+    public static void main(String[] args) {
+        // Ovo pokreće JavaFX aplikaciju
+        Application.launch(JavaFxApplication.class, args);
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/config/StageInitializer.java
+================================================
+package org.raflab.studsluzba.client.config;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import org.raflab.studsluzba.client.JavaFxApplication;
+import org.raflab.studsluzba.client.core.NavigationManager;
+import org.raflab.studsluzba.client.utils.SpringFXMLLoader;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Component
+public class StageInitializer implements ApplicationListener<JavaFxApplication.StageReadyEvent> {
+
+    private final SpringFXMLLoader springFXMLLoader;
+    private final NavigationManager navigationManager;
+
+    public StageInitializer(SpringFXMLLoader springFXMLLoader, NavigationManager navigationManager) {
+        this.springFXMLLoader = springFXMLLoader;
+        this.navigationManager = navigationManager;
+    }
+
+    @Override
+    public void onApplicationEvent(JavaFxApplication.StageReadyEvent event) {
+        try {
+            Stage stage = event.getStage();
+
+            // 1. Učitaj glavni okvir (Meni)
+            FXMLLoader loader = springFXMLLoader.load("/fxml/MainLayout.fxml");
+            Parent root = loader.load();
+
+            if (root instanceof BorderPane) {
+                Scene scene = new Scene(root, 1280, 800); // Malo veća rezolucija
+
+                // 2. Inicijalizuj navigaciju
+                navigationManager.initialize(scene, (BorderPane) root);
+
+                // 3. Odmah otvori Početnu stranu u centru
+                navigationManager.navigateTo("/fxml/Welcome.fxml");
+
+                stage.setScene(scene);
+                stage.setTitle("Studentska Služba - Klijent");
+                stage.show();
+            } else {
+                throw new IllegalStateException("MainLayout.fxml mora imati BorderPane kao koren!");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Greška pri pokretanju aplikacije", e);
+        }
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/controllers/MainController.java
+================================================
+package org.raflab.studsluzba.client.controllers;
+
+import javafx.fxml.FXML;
+import org.raflab.studsluzba.client.core.NavigationManager;
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class MainController {
+
+    private final NavigationManager navigationManager;
+
+    // Spring automatski ubacuje NavigationManager
+    public MainController(NavigationManager navigationManager) {
+        this.navigationManager = navigationManager;
+    }
+
+    @FXML
+    public void onPocetnaClick() {
+        navigationManager.navigateTo("/fxml/Welcome.fxml");
+    }
+
+    @FXML
+    public void onStudentiClick() {
+        navigationManager.navigateTo("/fxml/StudentSearch.fxml");
+
+    }
+
+    @FXML
+    public void onPredmetiClick() {
+        System.out.println("Kliknuto na Predmeti");
+    }
+
+    @FXML
+    public void onIspitiClick() {
+        System.out.println("Kliknuto na Ispiti");
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/controllers/StudentProfileController.java
+================================================
+package org.raflab.studsluzba.client.controllers;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import org.raflab.studsluzba.client.core.NavigationManager;
+import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.UpisanaGodinaResponseDTO;
+import org.raflab.studsluzba.client.service.ApiClient;
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class StudentProfileController {
+
+    // --- LABELI (HEADER & INFO) ---
+    @FXML private Label lblImePrezime;
+    @FXML private Label lblIndeks;
+    @FXML private Label lblJmbg;
+    @FXML private Label lblEmail;
+    @FXML private Label lblAdresa;
+    @FXML private Label lblSrednjaSkola;
+
+    // --- FINANSIJE (NOVO) ---
+    @FXML private Label lblZaduzenje;
+    @FXML private Label lblUplaceno;
+    @FXML private Label lblStanje;
+
+    // --- TABELA ISPITI ---
+    @FXML private TableView<PolozenIspitResponseDTO> ispitiTable;
+    @FXML private TableColumn<PolozenIspitResponseDTO, String> colPredmet;
+    @FXML private TableColumn<PolozenIspitResponseDTO, Integer> colEspb;
+    @FXML private TableColumn<PolozenIspitResponseDTO, Integer> colOcena;
+    @FXML private TableColumn<PolozenIspitResponseDTO, String> colDatum;
+
+    // --- TABELA TOK STUDIJA ---
+    @FXML private TableView<UpisanaGodinaResponseDTO> tokStudijaTable;
+    @FXML private TableColumn<UpisanaGodinaResponseDTO, Integer> colGodinaUpisa;
+    @FXML private TableColumn<UpisanaGodinaResponseDTO, String> colSkolskaGodina;
+    @FXML private TableColumn<UpisanaGodinaResponseDTO, String> colDatumUpisa;
+    @FXML private TableColumn<UpisanaGodinaResponseDTO, String> colTip;
+
+    private final ApiClient apiClient;
+    private final NavigationManager navigationManager;
+
+    public StudentProfileController(ApiClient apiClient, NavigationManager navigationManager) {
+        this.apiClient = apiClient;
+        this.navigationManager = navigationManager;
+    }
+
+    @FXML
+    public void initialize() {
+        // 1. Konfiguracija kolona za ISPITE
+        colPredmet.setCellValueFactory(new PropertyValueFactory<>("nazivPredmeta"));
+        colEspb.setCellValueFactory(new PropertyValueFactory<>("espb"));
+        colOcena.setCellValueFactory(new PropertyValueFactory<>("ocena"));
+        colDatum.setCellValueFactory(new PropertyValueFactory<>("datumPolaganja"));
+
+        // 2. Konfiguracija kolona za TOK STUDIJA
+        colGodinaUpisa.setCellValueFactory(new PropertyValueFactory<>("godinaKojaSeUpisuje"));
+        colSkolskaGodina.setCellValueFactory(new PropertyValueFactory<>("skolskaGodina"));
+        colDatumUpisa.setCellValueFactory(new PropertyValueFactory<>("datumUpisa"));
+        colTip.setCellValueFactory(new PropertyValueFactory<>("tip"));
+    }
+
+    // Glavna metoda za učitavanje podataka
+    public void loadStudentData(Long studentId) {
+        apiClient.getStudentById(studentId).subscribe(student -> {
+            Platform.runLater(() -> {
+                // Popunjavanje osnovnih podataka
+                lblImePrezime.setText(student.getIme() + " " + student.getPrezime());
+                lblIndeks.setText(student.getAktivniIndeks() + " - " + student.getStudijskiProgram());
+                lblJmbg.setText("JMBG: " + (student.getJmbg() != null ? student.getJmbg() : "Nema podataka"));
+                lblEmail.setText("Email: " + student.getEmail());
+                lblAdresa.setText("Adresa: " + (student.getAdresaStanovanja() != null ? student.getAdresaStanovanja() : "Nema podataka"));
+                lblSrednjaSkola.setText("Mesto rođenja: " + (student.getMestoRodjenja() != null ? student.getMestoRodjenja() : "Nema podataka"));
+
+                // Učitavanje podataka za tabove (ako postoji indeks)
+                if (student.getIndeksId() != null) {
+                    loadIspiti(student.getIndeksId());
+                    loadTokStudija(student.getIndeksId());
+                    loadFinansije(student.getIndeksId()); // <--- POZIV NOVE METODE
+                } else {
+                    System.err.println("UPOZORENJE: Student nema aktivan indeks ID!");
+                }
+            });
+        }, error -> {
+            Platform.runLater(() -> System.err.println("Greška pri učitavanju studenta: " + error.getMessage()));
+        });
+    }
+
+    private void loadIspiti(Long indeksId) {
+        apiClient.getPolozeniIspiti(indeksId)
+                .collectList()
+                .subscribe(ispiti -> {
+                    Platform.runLater(() -> {
+                        if (ispitiTable != null) {
+                            ispitiTable.getItems().setAll(ispiti);
+                        }
+                    });
+                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju ispita: " + error.getMessage())));
+    }
+
+    private void loadTokStudija(Long indeksId) {
+        apiClient.getUpisaneGodine(indeksId)
+                .collectList()
+                .subscribe(godine -> {
+                    Platform.runLater(() -> {
+                        if (tokStudijaTable != null) {
+                            tokStudijaTable.getItems().setAll(godine);
+                        }
+                    });
+                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju toka studija: " + error.getMessage())));
+    }
+
+    // NOVA METODA ZA FINANSIJE
+    private void loadFinansije(Long indeksId) {
+        apiClient.getStanjeFinansija(indeksId)
+                .subscribe(stanje -> {
+                    Platform.runLater(() -> {
+                        lblZaduzenje.setText(stanje.getUkupnoZaduzenje() + " RSD");
+                        lblUplaceno.setText(stanje.getUkupnoUplaceno() + " RSD");
+                        lblStanje.setText(stanje.getPreostaloZaUplatu() + " RSD");
+                    });
+                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju finansija: " + error.getMessage())));
+    }
+
+    @FXML
+    public void onBack() {
+        navigationManager.goBack();
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/controllers/StudentSearchController.java
+================================================
+package org.raflab.studsluzba.client.controllers;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.StringConverter;
+import org.raflab.studsluzba.client.core.NavigationManager;
+import org.raflab.studsluzba.client.dto.sifarnik.response.SrednjaSkolaResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.StudentProfileResponseDTO;
+import org.raflab.studsluzba.client.service.ApiClient;
+import org.springframework.stereotype.Controller;
+import reactor.core.publisher.Flux;
+
+@Controller
+public class StudentSearchController {
+
+    @FXML private TextField imeInput;
+    @FXML private TextField prezimeInput;
+
+    // --- NOVO: ComboBox za škole ---
+    @FXML private ComboBox<SrednjaSkolaResponseDTO> skolaCombo;
+
+    @FXML private TableView<StudentProfileResponseDTO> studentsTable;
+    @FXML private TableColumn<StudentProfileResponseDTO, String> colIndeks;
+    @FXML private TableColumn<StudentProfileResponseDTO, String> colIme;
+    @FXML private TableColumn<StudentProfileResponseDTO, String> colPrezime;
+    @FXML private TableColumn<StudentProfileResponseDTO, String> colProgram;
+    @FXML private TableColumn<StudentProfileResponseDTO, String> colEmail;
+
+    private final ApiClient apiClient;
+    private final NavigationManager navigationManager;
+
+    public StudentSearchController(ApiClient apiClient, NavigationManager navigationManager) {
+        this.apiClient = apiClient;
+        this.navigationManager = navigationManager;
+    }
+
+    @FXML
+    public void initialize() {
+        // 1. Konfiguracija kolona
+        colIndeks.setCellValueFactory(new PropertyValueFactory<>("aktivniIndeks"));
+        colIme.setCellValueFactory(new PropertyValueFactory<>("ime"));
+        colPrezime.setCellValueFactory(new PropertyValueFactory<>("prezime"));
+        colProgram.setCellValueFactory(new PropertyValueFactory<>("studijskiProgram"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+        // 2. Dvoklik na red
+        studentsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                StudentProfileResponseDTO selected = studentsTable.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    openProfile(selected.getId());
+                }
+            }
+        });
+
+        // 3. Konfiguracija ComboBox-a (da prikazuje naziv škole, a ne objekat)
+        skolaCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(SrednjaSkolaResponseDTO skola) {
+                return skola != null ? skola.getNaziv() : "";
+            }
+
+            @Override
+            public SrednjaSkolaResponseDTO fromString(String string) {
+                return null; // Nije potrebno
+            }
+        });
+
+        // 4. Učitaj podatke
+        loadSkole();
+        onSearch();
+    }
+
+    private void loadSkole() {
+        apiClient.getAllSrednjeSkole()
+                .collectList()
+                .subscribe(skole -> Platform.runLater(() -> skolaCombo.getItems().setAll(skole)));
+    }
+
+    @FXML
+    public void onSearch() {
+        String ime = imeInput.getText();
+        String prezime = prezimeInput.getText();
+        SrednjaSkolaResponseDTO izabranaSkola = skolaCombo.getValue();
+
+        Flux<StudentProfileResponseDTO> searchFlux;
+
+        // LOGIKA: Ako je izabrana škola, traži po školi.
+        // Ako nije, traži po imenu i prezimenu.
+        if (izabranaSkola != null) {
+            searchFlux = apiClient.getStudentiBySrednjaSkola(izabranaSkola.getId());
+        } else {
+            searchFlux = apiClient.searchStudents(ime, prezime);
+        }
+
+        searchFlux.collectList()
+                .subscribe(studenti -> {
+                    Platform.runLater(() -> {
+                        studentsTable.getItems().setAll(studenti);
+                    });
+                }, error -> Platform.runLater(() -> System.err.println("Greška: " + error.getMessage())));
+    }
+
+    // --- NOVO: Reset dugme ---
+    @FXML
+    public void onReset() {
+        imeInput.clear();
+        prezimeInput.clear();
+        skolaCombo.getSelectionModel().clearSelection();
+        onSearch(); // Vrati sve studente
+    }
+
+    private void openProfile(Long studentId) {
+        navigationManager.navigateTo("/fxml/StudentProfile.fxml", controller -> {
+            if (controller instanceof StudentProfileController) {
+                ((StudentProfileController) controller).loadStudentData(studentId);
+            }
+        });
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/core/NavigationManager.java
+================================================
+package org.raflab.studsluzba.client.core;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import org.raflab.studsluzba.client.utils.SpringFXMLLoader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Stack;
+import java.util.function.Consumer;
+
+@Component
+public class NavigationManager {
+
+    private final SpringFXMLLoader springFXMLLoader;
+    private BorderPane mainLayout; // Glavni kontejner gde se menjaju ekrani
+
+    // Stack za istoriju (Back i Forward)
+    private final Stack<NavigationState> backStack = new Stack<>();
+    private final Stack<NavigationState> forwardStack = new Stack<>();
+
+    private NavigationState currentState;
+
+    // Čitamo maksimalnu dubinu istorije iz application.properties
+    // Ako ne postoji u fajlu, podrazumevana vrednost je 10
+    @Value("${app.history.max-depth:10}")
+    private int maxHistoryDepth;
+
+    public NavigationManager(SpringFXMLLoader springFXMLLoader) {
+        this.springFXMLLoader = springFXMLLoader;
+    }
+
+    // Ovu metodu zovemo jednom na početku da setujemo scenu i layout
+    public void initialize(Scene scene, BorderPane mainLayout) {
+        this.mainLayout = mainLayout;
+        setupGlobalEventHandlers(scene);
+    }
+
+    public void navigateTo(String fxmlPath) {
+        navigateTo(fxmlPath, null);
+    }
+
+    public void navigateTo(String fxmlPath, Consumer<Object> controllerSetup) {
+        if (currentState != null) {
+            backStack.push(currentState);
+
+            // Ograničenje istorije na osnovu konfiguracije
+            if (backStack.size() > maxHistoryDepth) {
+                backStack.remove(0); // Izbacujemo najstariji element
+            }
+        }
+        forwardStack.clear(); // Nova grana, brišemo forward
+        loadView(fxmlPath, controllerSetup);
+    }
+
+    public void goBack() {
+        if (backStack.isEmpty()) return;
+
+        forwardStack.push(currentState);
+        NavigationState previous = backStack.pop();
+        loadView(previous.fxmlPath, previous.controllerSetup);
+    }
+
+    public void goForward() {
+        if (forwardStack.isEmpty()) return;
+
+        backStack.push(currentState);
+        NavigationState next = forwardStack.pop();
+        loadView(next.fxmlPath, next.controllerSetup);
+    }
+
+    private void loadView(String fxmlPath, Consumer<Object> controllerSetup) {
+        try {
+            FXMLLoader loader = springFXMLLoader.load(fxmlPath);
+            Parent view = loader.load();
+
+            // Ako treba podesiti kontroler (npr. poslati ID studenta)
+            if (controllerSetup != null) {
+                controllerSetup.accept(loader.getController());
+            }
+
+            // Postavi novi view u centar
+            mainLayout.setCenter(view);
+
+            currentState = new NavigationState(fxmlPath, controllerSetup);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Greška pri učitavanju FXML-a: " + fxmlPath);
+        }
+    }
+
+    private void setupGlobalEventHandlers(Scene scene) {
+        // Miš (Back/Forward dugmići - Button 4 i 5)
+        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            if (event.getButton() == MouseButton.BACK) {
+                goBack();
+                event.consume();
+            } else if (event.getButton() == MouseButton.FORWARD) {
+                goForward();
+                event.consume();
+            }
+        });
+
+        // Tastatura (Ctrl + [ za nazad, Ctrl + ] za napred)
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown()) {
+                if (event.getCode() == KeyCode.OPEN_BRACKET) {
+                    goBack();
+                    event.consume();
+                } else if (event.getCode() == KeyCode.CLOSE_BRACKET) {
+                    goForward();
+                    event.consume();
+                }
+            }
+        });
+    }
+
+    // Pomoćna klasa za čuvanje stanja
+    private static class NavigationState {
+        String fxmlPath;
+        Consumer<Object> controllerSetup;
+
+        public NavigationState(String fxmlPath, Consumer<Object> controllerSetup) {
+            this.fxmlPath = fxmlPath;
+            this.controllerSetup = controllerSetup;
+        }
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/KursnaListaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class KursnaListaResponseDTO {
+
+    @JsonProperty("srednji_kurs")
+    private BigDecimal srednjiKurs;
+
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/NastavnikOsnovnoDTO.java
+================================================
+package org.raflab.studsluzba.client.dto;
+
+import lombok.Data;
+
+@Data
+public class NastavnikOsnovnoDTO {
+    private Long id;
+    private String ime;
+    private String prezime;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/PredmetDTO.java
+================================================
+package org.raflab.studsluzba.client.dto;
+
+import lombok.Data;
+
+@Data
+public class PredmetDTO {
+    private Long id;
+    private String sifra;
+    private String naziv;
+    private Integer espb;
+    private Integer semestar;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/SifarnikItemDTO.java
+================================================
+package org.raflab.studsluzba.client.dto;
+
+import lombok.Data;
+
+@Data
+public class SifarnikItemDTO {
+    private Long id;
+    private String naziv;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/request/CreateIspitRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.request;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Data
+public class CreateIspitRequestDTO {
+    private Long drziPredmetId;
+    private Long ispitniRokId;
+    private LocalDate datumOdrzavanja;
+    private LocalTime vremePocetka;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/request/EvidencijaIzlaskaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.request;
+
+import lombok.Data;
+
+@Data
+public class EvidencijaIzlaskaRequestDTO {
+    private Long studentIndeksId;
+    private Long ispitId;
+    private Double poeniSaIspita;
+    private String napomena;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/request/PrijavaIspitaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.request;
+
+import lombok.Data;
+
+@Data
+public class PrijavaIspitaRequestDTO {
+    private Long studentIndeksId;
+    private Long ispitId;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/response/IspitniRokResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Data
+public class IspitniRokResponseDTO {
+    private Long id;
+    private String naziv;
+    private LocalDate datumPocetka;
+    private LocalDate datumZavrsetka;
+    private List<IspitResponseDTO> ispiti;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/response/IspitResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.response;
+
+import lombok.Data;
+import org.raflab.studsluzba.client.dto.NastavnikOsnovnoDTO;
+import org.raflab.studsluzba.client.dto.PredmetDTO;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Data
+public class IspitResponseDTO {
+    private Long id;
+    private PredmetDTO predmet;
+    private NastavnikOsnovnoDTO nastavnik;
+    private LocalDate datumOdrzavanja;
+    private LocalTime vremePocetka;
+    private boolean zakljucen;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/response/IspitRezultatResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.response;
+
+import lombok.Data;
+
+@Data
+public class IspitRezultatResponseDTO {
+    private String studentImePrezime;
+    private String brojIndeksa;
+    private Double poeniPredispitne;
+    private Double poeniIspit;
+    private Double ukupnoPoena;
+    private Integer ocena;
+    private boolean polozio;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/ispit/response/PrijavljeniStudentResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.ispit.response;
+
+import lombok.Data;
+
+@Data
+public class PrijavljeniStudentResponseDTO {
+    private String ime;
+    private String prezime;
+    private String brojIndeksa;
+    private String studijskiProgram;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/kurikulum/request/CreatePredispitnaObavezaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.kurikulum.request;
+
+import lombok.Data;
+
+@Data
+public class CreatePredispitnaObavezaRequestDTO {
+    private Long predmetId;
+    private Long skolskaGodinaId;
+    private String vrsta; // npr. "kolokvijum", "test", "domaći"
+    private Double maxPoena;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/kurikulum/request/CreatePredmetRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.kurikulum.request;
+
+import lombok.Data;
+
+@Data
+public class CreatePredmetRequestDTO {
+    private String sifra;
+    private String naziv;
+    private String opis;
+    private Integer espb;
+    private Integer semestar;
+    private boolean obavezan;
+    private Long studijskiProgramId;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/kurikulum/response/PredispitnaObavezaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.kurikulum.response;
+
+import lombok.Data;
+
+@Data
+public class PredispitnaObavezaResponseDTO {
+    private Long id;
+    private String vrsta;
+    private Double maxPoena;
+    private String skolskaGodina;
+    private Double osvojeniPoeni;
+
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/kurikulum/response/PredmetDetaljiResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.kurikulum.response;
+
+import lombok.Data;
+import org.raflab.studsluzba.client.dto.NastavnikOsnovnoDTO;
+
+import java.util.List;
+
+@Data
+public class PredmetDetaljiResponseDTO {
+    private Long id;
+    private String sifra;
+    private String naziv;
+    private String opis;
+    private Integer espb;
+    private Integer semestar;
+    private List<NastavnikOsnovnoDTO> nastavnici;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/kurikulum/response/StudijskiProgramResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.kurikulum.response;
+
+import lombok.Data;
+import org.raflab.studsluzba.client.dto.PredmetDTO;
+
+import java.util.List;
+
+@Data
+public class StudijskiProgramResponseDTO {
+    private Long id;
+    private String oznaka;
+    private String naziv;
+    private List<PredmetDTO> predmeti;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/request/CreateNastavnikRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.request;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class CreateNastavnikRequestDTO {
+    private String ime;
+    private String prezime;
+    private String srednjeIme;
+    private String email;
+    private LocalDate datumRodjenja;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/request/DodajObrazovanjeRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.request;
+
+import lombok.Data;
+
+@Data
+public class DodajObrazovanjeRequestDTO {
+    private Long nastavnikId;
+    private Long visokoskolskaUstanovaId;
+    private String vrstaStudija;
+    private String stecenoZvanje;
+    private Integer godinaZavrsetka;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/request/DodajZvanjeRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.request;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class DodajZvanjeRequestDTO {
+    private Long nastavnikId;
+    private String zvanje; // npr. "Docent", "Vanredni profesor"
+    private LocalDate datumIzbora;
+    private String naucnaOblast;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/response/NastavnikProfileResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Data
+public class NastavnikProfileResponseDTO {
+    private Long id;
+    private String ime;
+    private String prezime;
+    private String email;
+    private LocalDate datumRodjenja;
+    private ZvanjeResponseDTO aktivnoZvanje;
+    private List<ZvanjeResponseDTO> istorijaZvanja;
+    private List<ObrazovanjeResponseDTO> obrazovanja;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/response/ObrazovanjeResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.response;
+
+import lombok.Data;
+
+@Data
+public class ObrazovanjeResponseDTO {
+    private String nazivUstanove;
+    private String vrstaStudija;
+    private String stecenoZvanje;
+    private Integer godinaZavrsetka;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/nastavnik/response/ZvanjeResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.nastavnik.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class ZvanjeResponseDTO {
+    private String zvanje;
+    private LocalDate datumIzbora;
+    private String naucnaOblast;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/sifarnik/request/CreateSrednjaSkolaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.sifarnik.request;
+
+import lombok.Data;
+
+@Data
+public class CreateSrednjaSkolaRequestDTO {
+    private String naziv;
+    private String mesto;
+    private String vrsta;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/sifarnik/request/CreateVisokoskolskaUstanovaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.sifarnik.request;
+
+import lombok.Data;
+
+@Data
+public class CreateVisokoskolskaUstanovaRequestDTO {
+    private String naziv;
+    private String mesto;
+    private String skracenaOznaka;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/sifarnik/response/SrednjaSkolaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.sifarnik.response;
+
+import lombok.Data;
+
+@Data
+public class SrednjaSkolaResponseDTO {
+    private Long id;
+    private String naziv;
+    private String mesto;
+    private String vrsta;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/sifarnik/response/VisokoskolskaUstanovaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.sifarnik.response;
+
+import lombok.Data;
+
+@Data
+public class VisokoskolskaUstanovaResponseDTO {
+    private Long id;
+    private String naziv;
+    private String mesto;
+    private String skracenaOznaka;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/skolskagodina/request/CreateSkolskaGodinaRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.skolskagodina.request;
+
+import lombok.Data;
+
+@Data
+public class CreateSkolskaGodinaRequestDTO {
+    private String naziv; // npr. "2025/2026"
+    private boolean aktivna;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/skolskagodina/response/SkolskaGodinaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.skolskagodina.response;
+
+import lombok.Data;
+
+@Data
+public class SkolskaGodinaResponseDTO {
+    private Long id;
+    private String naziv;
+    private boolean aktivna;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/request/CreateStudentRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.request;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class CreateStudentRequestDTO {
+    private String ime;
+    private String prezime;
+    private String srednjeIme;
+    private String jmbg;
+    private LocalDate datumRodjenja;
+    private String mestoRodjenja;
+    private String adresaStanovanja;
+    private String email;
+    private String emailPrivatni;
+    private Double uspehSrednjaSkola;
+    private Double uspehPrijemni;
+    private Long idSrednjeSkole;
+    // ... dodati ostala polja iz StudentPodaci po potrebi
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/request/CreateUplataRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.request;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Data
+public class CreateUplataRequestDTO {
+    private Long studentIndeksId;
+    private BigDecimal iznos;
+    private LocalDate datumUplate;
+    private String svrha;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/request/ObnovaGodineRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.request;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class ObnovaGodineRequestDTO {
+    private Long studentIndeksId;
+    private Long skolskaGodinaId;
+    private List<Long> predmetiIzNaredneGodineIds;
+    private Integer godinaKojaSeObnavlja;
+
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/request/UpisGodineRequestDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.request;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class UpisGodineRequestDTO {
+    private Long studentIndeksId;
+    private Long skolskaGodinaId;
+    private List<Long> predmetiKojeUpisujeIds;
+    private Integer godinaKojaSeUpisuje;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/response/PolozenIspitResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class PolozenIspitResponseDTO {
+    private String sifraPredmeta;
+    private String nazivPredmeta;
+    private Integer ocena;
+    private Integer espb;
+    private LocalDate datumPolaganja;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/response/StanjeFinansijaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.response;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+@Data
+public class StanjeFinansijaResponseDTO {
+    private BigDecimal ukupnoZaduzenje;
+    private BigDecimal ukupnoUplaceno;
+    private BigDecimal preostaloZaUplatu;
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/response/StudentProfileResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class StudentProfileResponseDTO {
+    private Long id;
+    private String ime;
+    private String prezime;
+    private String jmbg;
+    private LocalDate datumRodjenja;
+    private String email;
+    private String aktivniIndeks; // npr. "123/2025"
+    private String studijskiProgram;
+    private String mestoRodjenja;
+    private String adresaStanovanja;
+
+    private Long indeksId;
+}
+
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/dto/student/response/UpisanaGodinaResponseDTO.java
+================================================
+package org.raflab.studsluzba.client.dto.student.response;
+
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class UpisanaGodinaResponseDTO {
+    private String skolskaGodina;
+    private Integer godinaKojaSeUpisuje;
+    private LocalDate datumUpisa;
+    private String tip; // "Upis" ili "Obnova"
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/service/ApiClient.java
+================================================
+package org.raflab.studsluzba.client.service;
+
+import org.raflab.studsluzba.client.dto.sifarnik.response.SrednjaSkolaResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.StanjeFinansijaResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.StudentProfileResponseDTO;
+import org.raflab.studsluzba.client.dto.student.response.UpisanaGodinaResponseDTO;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Service
+public class ApiClient {
+
+    private final WebClient webClient;
+
+    public ApiClient(WebClient.Builder webClientBuilder) {
+        // Povezujemo se na tvoj server
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8100/api").build();
+    }
+
+    // 1. Pretraga studenata
+    public Flux<StudentProfileResponseDTO> searchStudents(String ime, String prezime) {
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/studenti")
+                        .queryParam("ime", ime != null ? ime : "")
+                        .queryParam("prezime", prezime != null ? prezime : "")
+                        .build())
+                .retrieve()
+                .bodyToFlux(StudentProfileResponseDTO.class);
+    }
+
+    // 2. Dohvatanje profila studenta
+    public Mono<StudentProfileResponseDTO> getStudentById(Long id) {
+        return this.webClient.get()
+                .uri("/studenti/" + id)
+                .retrieve()
+                .bodyToMono(StudentProfileResponseDTO.class);
+    }
+
+    // 3. Dohvatanje položenih ispita (Za Tab "Ispiti")
+    public Flux<PolozenIspitResponseDTO> getPolozeniIspiti(Long indeksId) {
+        return this.webClient.get()
+                .uri("/karijera/" + indeksId + "/polozeni-ispiti")
+                .retrieve()
+                .bodyToFlux(PolozenIspitResponseDTO.class);
+    }
+
+    // 4. Dohvatanje toka studija (Za Tab "Tok Studija")
+    public Flux<UpisanaGodinaResponseDTO> getUpisaneGodine(Long indeksId) {
+        return this.webClient.get()
+                .uri("/karijera/" + indeksId + "/upisane-godine")
+                .retrieve()
+                .bodyToFlux(UpisanaGodinaResponseDTO.class);
+    }
+
+    // 5. Dohvatanje finansijskog stanja
+    public Mono<StanjeFinansijaResponseDTO> getStanjeFinansija(Long indeksId) {
+        return this.webClient.get()
+                .uri("/studenti/" + indeksId + "/finansije")
+                .retrieve()
+                .bodyToMono(StanjeFinansijaResponseDTO.class);
+    }
+    // 6. Dohvatanje svih srednjih škola (za ComboBox)
+    public Flux<SrednjaSkolaResponseDTO> getAllSrednjeSkole() {
+        return this.webClient.get()
+                .uri("/sifarnici/srednje-skole")
+                .retrieve()
+                .bodyToFlux(SrednjaSkolaResponseDTO.class);
+    }
+
+    // 7. Pretraga studenata po srednjoj školi
+    public Flux<StudentProfileResponseDTO> getStudentiBySrednjaSkola(Long skolaId) {
+        return this.webClient.get()
+                .uri("/studenti/srednja-skola/" + skolaId)
+                .retrieve()
+                .bodyToFlux(StudentProfileResponseDTO.class);
+    }
+}
+
+
+================================================
+FILE: src/main/java/org/raflab/studsluzba/client/utils/SpringFXMLLoader.java
+================================================
+package org.raflab.studsluzba.client.utils;
+
+import javafx.fxml.FXMLLoader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SpringFXMLLoader {
+    private final ApplicationContext context;
+
+    public SpringFXMLLoader(ApplicationContext context) {
+        this.context = context;
+    }
+
+    public FXMLLoader load(String fxmlPath) {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setControllerFactory(context::getBean); // Ovo omogućava Springu da upravlja kontrolerima
+        loader.setLocation(getClass().getResource(fxmlPath));
+        return loader;
+    }
+}
+
+
+================================================
+FILE: src/main/resources/application.properties
+================================================
+spring.application.name=StudSluzba Klijent
+app.history.max-depth=10
+
+
+================================================
+FILE: src/main/resources/fxml/MainLayout.fxml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="mainContainer" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.MainController">
+
+    <!-- LEVI MENI -->
+    <left>
+        <VBox prefHeight="768.0" prefWidth="220.0" spacing="10.0" style="-fx-background-color: #2c3e50;" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Studentska Služba" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="20.0" left="10.0" top="20.0" />
+                    </VBox.margin>
+                </Label>
+                <Separator prefWidth="200.0" />
+
+                <Button mnemonicParsing="false" onAction="#onPocetnaClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="🏠  Početna">
+                    <padding><Insets left="20.0" /></padding>
+                    <font><Font size="14.0" /></font>
+                </Button>
+
+                <Button mnemonicParsing="false" onAction="#onStudentiClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="🎓  Studenti">
+                    <padding><Insets left="20.0" /></padding>
+                    <font><Font size="14.0" /></font>
+                </Button>
+
+                <Button mnemonicParsing="false" onAction="#onPredmetiClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="📚  Predmeti">
+                    <padding><Insets left="20.0" /></padding>
+                    <font><Font size="14.0" /></font>
+                </Button>
+
+                <Button mnemonicParsing="false" onAction="#onIspitiClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="📝  Ispiti">
+                    <padding><Insets left="20.0" /></padding>
+                    <font><Font size="14.0" /></font>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <!-- CENTAR -->
+    <center>
+        <Label text="Učitavanje..." BorderPane.alignment="CENTER" />
+    </center>
+
+</BorderPane>
+
+
+================================================
+FILE: src/main/resources/fxml/StudentProfile.fxml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.StudentProfileController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- HEADER: Ime i Indeks -->
+    <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #ecf0f1; -fx-background-radius: 5;">
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+        <children>
+            <VBox>
+                <children>
+                    <Label fx:id="lblImePrezime" text="Ime Prezime">
+                        <font>
+                            <Font name="System Bold" size="28.0" />
+                        </font>
+                    </Label>
+                    <Label fx:id="lblIndeks" text="123/2023 - Računarsko inženjerstvo" textFill="#7f8c8d">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                </children>
+            </VBox>
+            <AnchorPane HBox.hgrow="ALWAYS" /> <!-- Spacer -->
+            <Button onAction="#onBack" text="⬅ Nazad" />
+        </children>
+    </HBox>
+
+    <!-- TABOVI -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+            <!-- TAB 1: LIČNI PODACI -->
+            <Tab text="Lični Podaci">
+                <content>
+                    <VBox spacing="15.0">
+                        <padding><Insets top="20.0" /></padding>
+                        <Label fx:id="lblJmbg" text="JMBG: ..." />
+                        <Label fx:id="lblEmail" text="Email: ..." />
+                        <Label fx:id="lblAdresa" text="Adresa: ..." />
+                        <Label fx:id="lblSrednjaSkola" text="Srednja škola: ..." />
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- TAB 2: TOK STUDIJA (TABELA) -->
+            <Tab text="Tok Studija">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                        <TableView fx:id="tokStudijaTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colGodinaUpisa" prefWidth="100.0" text="Godina Studija" />
+                                <TableColumn fx:id="colSkolskaGodina" prefWidth="150.0" text="Školska Godina" />
+                                <TableColumn fx:id="colDatumUpisa" prefWidth="150.0" text="Datum Upisa" />
+                                <TableColumn fx:id="colTip" prefWidth="100.0" text="Tip" />
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- TAB 3: ISPITI (TABELA) -->
+            <Tab text="Ispiti">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                        <TableView fx:id="ispitiTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colPredmet" prefWidth="250.0" text="Predmet" />
+                                <TableColumn fx:id="colEspb" prefWidth="75.0" text="ESPB" />
+                                <TableColumn fx:id="colOcena" prefWidth="75.0" text="Ocena" />
+                                <TableColumn fx:id="colDatum" prefWidth="150.0" text="Datum" />
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <Tab text="Finansije">
+                <content>
+                    <VBox spacing="20.0" alignment="TOP_CENTER">
+                        <padding>
+                            <Insets top="30.0" bottom="30.0" left="30.0" right="30.0" />
+                        </padding>
+
+                        <Label text="Finansijsko Stanje" textFill="#7f8c8d">
+                            <font><Font size="24.0" /></font>
+                        </Label>
+
+                        <HBox spacing="40.0" alignment="CENTER">
+                            <!-- KARTICA 1: ZADUŽENJE -->
+                            <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
+                                <Label text="Ukupno Zaduženje" />
+                                <Label fx:id="lblZaduzenje" text="0.00 RSD" textFill="#e74c3c">
+                                    <font><Font name="System Bold" size="20.0" /></font>
+                                </Label>
+                            </VBox>
+
+                            <!-- KARTICA 2: UPLAĆENO -->
+                            <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
+                                <Label text="Ukupno Uplaćeno" />
+                                <Label fx:id="lblUplaceno" text="0.00 RSD" textFill="#27ae60">
+                                    <font><Font name="System Bold" size="20.0" /></font>
+                                </Label>
+                            </VBox>
+
+                            <!-- KARTICA 3: STANJE -->
+                            <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
+                                <Label text="Preostalo za uplatu" />
+                                <Label fx:id="lblStanje" text="0.00 RSD" textFill="#2980b9">
+                                    <font><Font name="System Bold" size="20.0" /></font>
+                                </Label>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
+</VBox>
+
+
+================================================
+FILE: src/main/resources/fxml/StudentSearch.fxml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.StudentSearchController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- NASLOV -->
+    <Label text="Pretraga Studenata">
+        <font>
+            <Font name="System Bold" size="24.0" />
+        </font>
+    </Label>
+
+    <!-- FORMA ZA PRETRAGU -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <TextField fx:id="imeInput" prefWidth="150.0" promptText="Ime studenta" />
+        <TextField fx:id="prezimeInput" prefWidth="150.0" promptText="Prezime studenta" />
+
+        <!-- OVO JE FALILO: -->
+        <ComboBox fx:id="skolaCombo" prefWidth="220.0" promptText="Izaberi srednju školu" />
+
+        <Button onAction="#onSearch" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;" text="🔍 Pretraži" />
+
+        <!-- OVO JE FALILO: -->
+        <Button onAction="#onReset" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" text="❌" />
+    </HBox>
+
+    <!-- TABELA REZULTATA -->
+    <TableView fx:id="studentsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIndeks" prefWidth="100.0" text="Indeks" />
+            <TableColumn fx:id="colIme" prefWidth="150.0" text="Ime" />
+            <TableColumn fx:id="colPrezime" prefWidth="150.0" text="Prezime" />
+            <TableColumn fx:id="colProgram" prefWidth="150.0" text="Studijski Program" />
+            <TableColumn fx:id="colEmail" prefWidth="200.0" text="Email" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+</VBox>
+
+
+================================================
+FILE: src/main/resources/fxml/Welcome.fxml
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label text="Dobrodošli u Studentsku Službu">
+            <font>
+                <Font name="System Bold" size="32.0" />
+            </font>
+        </Label>
+        <Label text="Izaberite opciju iz menija sa leve strane." textFill="#757575">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Label>
+    </children>
+</VBox>
+
