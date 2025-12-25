@@ -31,13 +31,11 @@ public class SubjectsController {
 
     @FXML
     public void initialize() {
-        // Konfiguracija kolona tabele
         colSifra.setCellValueFactory(new PropertyValueFactory<>("sifra"));
         colNaziv.setCellValueFactory(new PropertyValueFactory<>("naziv"));
         colEspb.setCellValueFactory(new PropertyValueFactory<>("espb"));
         colSemestar.setCellValueFactory(new PropertyValueFactory<>("semestar"));
 
-        // Konfiguracija prikaza u listi (da piše naziv programa, a ne objekat)
         programiList.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(StudijskiProgramResponseDTO item, boolean empty) {
@@ -50,7 +48,6 @@ public class SubjectsController {
             }
         });
 
-        // Listener za klik na program
         programiList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 loadPredmeti(newVal.getId());

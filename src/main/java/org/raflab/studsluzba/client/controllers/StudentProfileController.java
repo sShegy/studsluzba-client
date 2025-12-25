@@ -66,7 +66,6 @@ public class StudentProfileController {
     private final NavigationManager navigationManager;
     private final ReportService reportService;
 
-    // Čuvamo ID indeksa trenutno učitanog studenta da bismo mogli da vršimo uplate
     private Long currentIndeksId;
 
     public StudentProfileController(ApiClient apiClient, NavigationManager navigationManager, ReportService reportService) {
@@ -190,7 +189,6 @@ public class StudentProfileController {
                 }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju finansija: " + error.getMessage())));
     }
 
-    // --- METODA ZA DUGME "NOVA UPLATA" ---
     @FXML
     public void onNovaUplata() {
         if (this.currentIndeksId == null) return;
@@ -256,7 +254,6 @@ public class StudentProfileController {
             String ime = lblImePrezime.getText();
             String indeks = lblIndeks.getText();
 
-            // 1. Uzimamo kopiju liste iz tabele
             var listaIspita = new java.util.ArrayList<>(ispitiTable.getItems());
 
             if (listaIspita.isEmpty()) {
@@ -266,32 +263,23 @@ public class StudentProfileController {
                 return;
             }
 
-            // 2. --- FIX: POPUNJAVANJE GODINE STUDIJA ---
-            // Pošto backend verovatno ne šalje godinu, ovde ćemo je "izračunati" ili staviti default
-            // da bi izveštaj lepo izgledao (Grupisanje zahteva da polje nije null).
+
             for (PolozenIspitResponseDTO ispit : listaIspita) {
                 if (ispit.getGodinaStudija() == null) {
-                    // LOGIKA: Ako imamo semestar, godina = (semestar + 1) / 2
-                    // Ako nemamo semestar, stavićemo fiksno 1. godinu za potrebe demonstracije
-                    // ili možeš nasumično dodeliti ako želiš da vidiš više grupa (npr. Math.random() > 0.5 ? 1 : 2)
-
                     ispit.setGodinaStudija(1); // Stavljamo sve u prvu godinu
                 }
             }
 
-            // 3. SORTIRANJE (OBAVEZNO ZA JASPER GRUPISANJE)
-            // Moramo sortirati po godini da bi Jasper napravio grupe kako treba
             listaIspita.sort((i1, i2) -> {
                 int g1 = i1.getGodinaStudija() != null ? i1.getGodinaStudija() : 0;
                 int g2 = i2.getGodinaStudija() != null ? i2.getGodinaStudija() : 0;
                 return Integer.compare(g1, g2);
             });
 
-            // 4. Generisanje izveštaja
             reportService.generateUverenjePolozeni(ime, indeks, listaIspita);
 
         } catch (Exception e) {
-            e.printStackTrace(); // Ispiši grešku u konzolu da vidimo šta je
+            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Greška pri štampi: " + e.getMessage());
             alert.showAndWait();

@@ -41,14 +41,12 @@ public class StudentSearchController {
 
     @FXML
     public void initialize() {
-        // Konfiguracija kolona
         colIndeks.setCellValueFactory(new PropertyValueFactory<>("aktivniIndeks"));
         colIme.setCellValueFactory(new PropertyValueFactory<>("ime"));
         colPrezime.setCellValueFactory(new PropertyValueFactory<>("prezime"));
         colProgram.setCellValueFactory(new PropertyValueFactory<>("studijskiProgram"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        // Klik na red u tabeli otvara profil
         studentsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 StudentProfileResponseDTO selected = studentsTable.getSelectionModel().getSelectedItem();
@@ -58,7 +56,6 @@ public class StudentSearchController {
             }
         });
 
-        // Konfiguracija ComboBox-a da prikazuje naziv škole
         skolaCombo.setConverter(new StringConverter<>() {
             @Override
             public String toString(SrednjaSkolaResponseDTO skola) {
@@ -71,7 +68,6 @@ public class StudentSearchController {
             }
         });
 
-        // Povećavamo broj vidljivih redova u padajućem meniju
         skolaCombo.setVisibleRowCount(15);
 
         loadSkole();
