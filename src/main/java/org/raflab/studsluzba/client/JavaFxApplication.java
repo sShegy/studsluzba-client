@@ -12,7 +12,9 @@ public class JavaFxApplication extends Application {
 
     @Override
     public void init() {
-        context = new SpringApplicationBuilder(StudsluzbaClientApp.class).run();
+        context = new SpringApplicationBuilder(StudsluzbaClientApp.class)
+                .headless(false)
+                .run();
     }
 
     @Override

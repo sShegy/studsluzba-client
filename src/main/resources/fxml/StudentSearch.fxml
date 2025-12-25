@@ -23,13 +23,15 @@
     </Label>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <!-- NOVO POLJE ZA INDEKS -->
+        <TextField fx:id="indeksInput" prefWidth="120.0" promptText="Br. Indeksa (npr. 123)" />
+
         <TextField fx:id="imeInput" prefWidth="150.0" promptText="Ime studenta" />
         <TextField fx:id="prezimeInput" prefWidth="150.0" promptText="Prezime studenta" />
 
         <ComboBox fx:id="skolaCombo" prefWidth="220.0" promptText="Izaberi srednju školu" />
 
         <Button onAction="#onSearch" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;" text="🔍 Pretraži" />
-
 
         <Button onAction="#onReset" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" text="❌" />
     </HBox>
