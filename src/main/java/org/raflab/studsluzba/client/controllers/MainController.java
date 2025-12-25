@@ -26,9 +26,8 @@ public class MainController {
 
     @FXML
     public void onPredmetiClick() {
-        System.out.println("Kliknuto na Predmeti");
+        navigationManager.navigateTo("/fxml/Subjects.fxml");
     }
-
     @FXML
     public void onIspitiClick() {
         System.out.println("Kliknuto na Ispiti");

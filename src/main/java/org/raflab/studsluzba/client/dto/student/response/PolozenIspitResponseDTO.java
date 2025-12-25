@@ -11,4 +11,7 @@ public class PolozenIspitResponseDTO {
     private Integer ocena;
     private Integer espb;
     private LocalDate datumPolaganja;
+
+    private Integer godinaStudija;
+
 }

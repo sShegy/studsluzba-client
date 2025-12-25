@@ -12,41 +12,65 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<!-- PAŽNJA: Ovde je promenjeno 'controller' u 'controllers' -->
 <VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.StudentProfileController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
+    <!-- HEADER: Ime, Indeks i Dugmići -->
     <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #ecf0f1; -fx-background-radius: 5;">
         <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
         </padding>
         <children>
-            <VBox>
+            <VBox spacing="5.0">
                 <children>
                     <Label fx:id="lblImePrezime" text="Ime Prezime">
                         <font>
                             <Font name="System Bold" size="28.0" />
                         </font>
                     </Label>
+
                     <Label fx:id="lblIndeks" text="123/2023 - Računarsko inženjerstvo" textFill="#7f8c8d">
                         <font>
                             <Font size="18.0" />
                         </font>
                     </Label>
+
+                    <!-- PROSEK I ESPB -->
+                    <HBox spacing="15.0">
+                        <Label fx:id="lblProsek" text="Prosek: 0.00" textFill="#2980b9">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                        </Label>
+                        <Label fx:id="lblEspb" text="Ukupno ESPB: 0" textFill="#27ae60">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                        </Label>
+                    </HBox>
                 </children>
             </VBox>
+
             <AnchorPane HBox.hgrow="ALWAYS" /> <!-- Spacer -->
+
+            <!-- DUGME 1: UVERENJE O STUDIRANJU -->
+            <Button text="🖨 Uverenje o studiranju" onAction="#onStampajUverenje" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-cursor: hand;" />
+
+            <!-- DUGME 2: POLOŽENI ISPITI -->
+            <Button text="📜 Položeni Ispiti" onAction="#onStampajPolozeno" style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-cursor: hand;" />
+
+            <!-- DUGME NAZAD -->
             <Button onAction="#onBack" text="⬅ Nazad" />
         </children>
     </HBox>
 
+    <!-- TABOVI -->
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
+            <!-- TAB 1: LIČNI PODACI -->
             <Tab text="Lični Podaci">
                 <content>
                     <VBox spacing="15.0">
-                        <padding><Insets top="20.0" /></padding>
+                        <padding><Insets top="20.0" left="20.0" /></padding>
                         <Label fx:id="lblJmbg" text="JMBG: ..." />
                         <Label fx:id="lblEmail" text="Email: ..." />
                         <Label fx:id="lblAdresa" text="Adresa: ..." />
@@ -55,6 +79,7 @@
                 </content>
             </Tab>
 
+            <!-- TAB 2: TOK STUDIJA -->
             <Tab text="Tok Studija">
                 <content>
                     <VBox spacing="10.0">
@@ -63,7 +88,7 @@
                         </padding>
                         <TableView fx:id="tokStudijaTable" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colGodinaUpisa" prefWidth="100.0" text="Godina Studija" />
+                                <TableColumn fx:id="colGodinaUpisa" prefWidth="100.0" text="Godina" />
                                 <TableColumn fx:id="colSkolskaGodina" prefWidth="150.0" text="Školska Godina" />
                                 <TableColumn fx:id="colDatumUpisa" prefWidth="150.0" text="Datum Upisa" />
                                 <TableColumn fx:id="colTip" prefWidth="100.0" text="Tip" />
@@ -76,7 +101,8 @@
                 </content>
             </Tab>
 
-            <Tab text="Ispiti">
+            <!-- TAB 3: POLOŽENI ISPITI -->
+            <Tab text="Položeni Ispiti">
                 <content>
                     <VBox spacing="10.0">
                         <padding>
@@ -97,6 +123,27 @@
                 </content>
             </Tab>
 
+            <!-- TAB 4: NEPOLOŽENI -->
+            <Tab text="Nepoloženi">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                        <TableView fx:id="nepolozeniTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colNepolozeniSifra" prefWidth="100.0" text="Šifra" />
+                                <TableColumn fx:id="colNepolozeniNaziv" prefWidth="250.0" text="Predmet" />
+                                <TableColumn fx:id="colNepolozeniEspb" prefWidth="75.0" text="ESPB" />
+                                <TableColumn fx:id="colNepolozeniSemestar" prefWidth="75.0" text="Semestar" />
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- TAB 5: FINANSIJE -->
             <Tab text="Finansije">
                 <content>
                     <VBox spacing="20.0" alignment="TOP_CENTER">
@@ -109,6 +156,7 @@
                         </Label>
 
                         <HBox spacing="40.0" alignment="CENTER">
+                            <!-- KARTICA 1: ZADUŽENJE -->
                             <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
                                 <Label text="Ukupno Zaduženje" />
                                 <Label fx:id="lblZaduzenje" text="0.00 RSD" textFill="#e74c3c">
@@ -116,6 +164,7 @@
                                 </Label>
                             </VBox>
 
+                            <!-- KARTICA 2: UPLAĆENO -->
                             <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
                                 <Label text="Ukupno Uplaćeno" />
                                 <Label fx:id="lblUplaceno" text="0.00 RSD" textFill="#27ae60">
@@ -123,6 +172,7 @@
                                 </Label>
                             </VBox>
 
+                            <!-- KARTICA 3: STANJE -->
                             <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1; -fx-background-radius: 10; -fx-padding: 20;">
                                 <Label text="Preostalo za uplatu" />
                                 <Label fx:id="lblStanje" text="0.00 RSD" textFill="#2980b9">
@@ -130,6 +180,13 @@
                                 </Label>
                             </VBox>
                         </HBox>
+
+                        <!-- DUGME ZA UPLATU -->
+                        <Button text="💰 Evidentiraj Novu Uplatu" onAction="#onNovaUplata"
+                                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;">
+                            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+                        </Button>
+
                     </VBox>
                 </content>
             </Tab>

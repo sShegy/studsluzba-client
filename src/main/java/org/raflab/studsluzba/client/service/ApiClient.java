@@ -1,6 +1,8 @@
 package org.raflab.studsluzba.client.service;
 
+import org.raflab.studsluzba.client.dto.PredmetDTO;
 import org.raflab.studsluzba.client.dto.sifarnik.response.SrednjaSkolaResponseDTO;
+import org.raflab.studsluzba.client.dto.student.request.CreateUplataRequestDTO;
 import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
 import org.raflab.studsluzba.client.dto.student.response.StanjeFinansijaResponseDTO;
 import org.raflab.studsluzba.client.dto.student.response.StudentProfileResponseDTO;
@@ -20,10 +22,11 @@ public class ApiClient {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8100/api").build();
     }
 
-    // 1. Pretraga studenata
-    public Flux<StudentProfileResponseDTO> searchStudents(String ime, String prezime) {
+    // 1. Pretraga studenata (Ažurirano)
+    public Flux<StudentProfileResponseDTO> searchStudents(String indeks, String ime, String prezime) {
         return this.webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/studenti")
+                        .queryParam("brojIndeksa", indeks != null ? indeks : "") // <--- NOVO
                         .queryParam("ime", ime != null ? ime : "")
                         .queryParam("prezime", prezime != null ? prezime : "")
                         .build())
@@ -76,5 +79,35 @@ public class ApiClient {
                 .uri("/studenti/srednja-skola/" + skolaId)
                 .retrieve()
                 .bodyToFlux(StudentProfileResponseDTO.class);
+    }
+    // 8. Slanje nove uplate (POST)
+    public Mono<Long> addUplata(CreateUplataRequestDTO request) {
+        return this.webClient.post()
+                .uri("/studenti/uplate")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
+
+    public Flux<PredmetDTO> getNepolozeniIspiti(Long indeksId) {
+        return this.webClient.get()
+                .uri("/karijera/" + indeksId + "/nepolozeni-ispiti")
+                .retrieve()
+                .bodyToFlux(PredmetDTO.class);
+    }
+    // 9. Dohvatanje svih studijskih programa
+    public Flux<org.raflab.studsluzba.client.dto.kurikulum.response.StudijskiProgramResponseDTO> getStudijskiProgrami() {
+        return this.webClient.get()
+                .uri("/kurikulum/studijski-programi")
+                .retrieve()
+                .bodyToFlux(org.raflab.studsluzba.client.dto.kurikulum.response.StudijskiProgramResponseDTO.class);
+    }
+
+    // 10. Dohvatanje predmeta za određeni studijski program
+    public Flux<org.raflab.studsluzba.client.dto.kurikulum.response.PredmetDetaljiResponseDTO> getPredmetiByProgram(Long programId) {
+        return this.webClient.get()
+                .uri("/kurikulum/studijski-programi/" + programId + "/predmeti")
+                .retrieve()
+                .bodyToFlux(org.raflab.studsluzba.client.dto.kurikulum.response.PredmetDetaljiResponseDTO.class);
     }
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Uverenje" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="272556d9-3cb2-4d2e-8727-6465216f6056">
+    <parameter name="studentImePrezime" class="java.lang.String"/>
+    <parameter name="brojIndeksa" class="java.lang.String"/>
+    <parameter name="studijskiProgram" class="java.lang.String"/>
+    <parameter name="datum" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[]]>
+    </queryString>
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    <title>
+        <band height="79" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="20" width="555" height="30" uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef"/>
+                <textElement textAlignment="Center">
+                    <font size="22" isBold="true"/>
+                </textElement>
+                <text><![CDATA[UNIVERZITET UNION - RAČUNARSKI FAKULTET]]></text>
+            </staticText>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="60" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" uuid="12345678-1234-1234-1234-1234567890ab"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true" isUnderline="true"/>
+                </textElement>
+                <text><![CDATA[UVERENJE O STUDIRANJU]]></text>
+            </staticText>
+        </band>
+    </pageHeader>
+    <detail>
+        <band height="300" splitType="Stretch">
+            <staticText>
+                <reportElement x="20" y="20" width="515" height="30" uuid="abcdef12-3456-7890-abcd-ef1234567890"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <text><![CDATA[Potvrđuje se da je student:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="20" y="60" width="515" height="30" uuid="11111111-2222-3333-4444-555555555555"/>
+                <textElement textAlignment="Center">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{studentImePrezime}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="100" width="150" height="30" uuid="22222222-3333-4444-5555-666666666666"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <text><![CDATA[Broj indeksa:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="100" width="355" height="30" uuid="33333333-4444-5555-6666-777777777777"/>
+                <textElement>
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{brojIndeksa}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="140" width="150" height="30" uuid="44444444-5555-6666-7777-888888888888"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <text><![CDATA[Studijski program:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="140" width="355" height="30" uuid="55555555-6666-7777-8888-999999999999"/>
+                <textElement>
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{studijskiProgram}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="200" width="515" height="60" uuid="66666666-7777-8888-9999-aaaaaaaaaaaa"/>
+                <textElement>
+                    <font size="12"/>
+                </textElement>
+                <text><![CDATA[Ovo uverenje se izdaje na lični zahtev studenta i služi za regulisanje prava na zdravstveno osiguranje, povlastice za prevoz i ostale potrebe.]]></text>
+            </staticText>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="54" splitType="Stretch">
+            <staticText>
+                <reportElement x="20" y="10" width="100" height="30" uuid="77777777-8888-9999-aaaa-bbbbbbbbbbbb"/>
+                <text><![CDATA[U Beogradu, dana:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="120" y="10" width="150" height="30" uuid="88888888-9999-aaaa-bbbb-cccccccccccc"/>
+                <textFieldExpression><![CDATA[$P{datum}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="400" y="10" width="135" height="30" uuid="99999999-aaaa-bbbb-cccc-dddddddddddd"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[Studentska služba]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+</jasperReport>
