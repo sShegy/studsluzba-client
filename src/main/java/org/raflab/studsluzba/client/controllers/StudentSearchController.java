@@ -8,6 +8,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
+import org.raflab.studsluzba.client.core.ClientCache;
 import org.raflab.studsluzba.client.core.NavigationManager;
 import org.raflab.studsluzba.dto.sifarnik.response.SrednjaSkolaResponseDTO;
 import org.raflab.studsluzba.dto.student.response.StudentProfileResponseDTO;
@@ -21,9 +22,7 @@ public class StudentSearchController {
     @FXML private TextField indeksInput;
     @FXML private TextField imeInput;
     @FXML private TextField prezimeInput;
-
     @FXML private ComboBox<SrednjaSkolaResponseDTO> skolaCombo;
-
     @FXML private TableView<StudentProfileResponseDTO> studentsTable;
     @FXML private TableColumn<StudentProfileResponseDTO, String> colIndeks;
     @FXML private TableColumn<StudentProfileResponseDTO, String> colIme;
@@ -33,10 +32,12 @@ public class StudentSearchController {
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
+    private final ClientCache clientCache; // <--- KEŠ
 
-    public StudentSearchController(ApiClient apiClient, NavigationManager navigationManager) {
+    public StudentSearchController(ApiClient apiClient, NavigationManager navigationManager, ClientCache clientCache) {
         this.apiClient = apiClient;
         this.navigationManager = navigationManager;
+        this.clientCache = clientCache;
     }
 
     @FXML
@@ -50,24 +51,14 @@ public class StudentSearchController {
         studentsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 StudentProfileResponseDTO selected = studentsTable.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    openProfile(selected.getId());
-                }
+                if (selected != null) openProfile(selected.getId());
             }
         });
 
         skolaCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(SrednjaSkolaResponseDTO skola) {
-                return skola != null ? skola.getNaziv() : "";
-            }
-
-            @Override
-            public SrednjaSkolaResponseDTO fromString(String string) {
-                return null;
-            }
+            @Override public String toString(SrednjaSkolaResponseDTO skola) { return skola != null ? skola.getNaziv() : ""; }
+            @Override public SrednjaSkolaResponseDTO fromString(String string) { return null; }
         });
-
         skolaCombo.setVisibleRowCount(15);
 
         loadSkole();
@@ -75,16 +66,16 @@ public class StudentSearchController {
     }
 
     private void loadSkole() {
-        apiClient.getAllSrednjeSkole()
-                .collectList()
-                .subscribe(skole -> {
-                    Platform.runLater(() -> {
-                        // SADA JE OVO ČISTO:
-                        // Samo uzimamo listu koju je server poslao (sa pravim imenima)
-                        // i ubacujemo je u ComboBox.
-                        skolaCombo.getItems().setAll(skole);
-                    });
-                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju škola: " + error.getMessage())));
+        // --- KEŠIRANJE ---
+        if (clientCache.hasSrednjeSkole()) {
+            Platform.runLater(() -> skolaCombo.getItems().setAll(clientCache.getSrednjeSkole()));
+            return;
+        }
+
+        apiClient.getAllSrednjeSkole().collectList().subscribe(skole -> {
+            clientCache.setSrednjeSkole(skole); // Sačuvaj u keš
+            Platform.runLater(() -> skolaCombo.getItems().setAll(skole));
+        }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju škola: " + error.getMessage())));
     }
 
     @FXML
@@ -95,29 +86,23 @@ public class StudentSearchController {
         SrednjaSkolaResponseDTO izabranaSkola = skolaCombo.getValue();
 
         Flux<StudentProfileResponseDTO> searchFlux;
-
         if (izabranaSkola != null) {
             searchFlux = apiClient.getStudentiBySrednjaSkola(izabranaSkola.getId());
         } else {
-            // Šaljemo parametre serveru
             searchFlux = apiClient.searchStudents(trazeniIndeks, ime, prezime);
         }
 
-        searchFlux.collectList()
-                .subscribe(studenti -> {
-                    Platform.runLater(() -> {
-                        // Filtriranje na klijentu za indeks (ako server ne podržava filtriranje po indeksu)
-                        var filtriranaLista = studenti;
-
-                        if (!trazeniIndeks.isEmpty()) {
-                            filtriranaLista = studenti.stream()
-                                    .filter(s -> s.getAktivniIndeks() != null &&
-                                            s.getAktivniIndeks().contains(trazeniIndeks))
-                                    .toList();
-                        }
-                        studentsTable.getItems().setAll(filtriranaLista);
-                    });
-                }, error -> Platform.runLater(() -> System.err.println("Greška pretraga: " + error.getMessage())));
+        searchFlux.collectList().subscribe(studenti -> {
+            Platform.runLater(() -> {
+                var filtriranaLista = studenti;
+                if (!trazeniIndeks.isEmpty()) {
+                    filtriranaLista = studenti.stream()
+                            .filter(s -> s.getAktivniIndeks() != null && s.getAktivniIndeks().contains(trazeniIndeks))
+                            .toList();
+                }
+                studentsTable.getItems().setAll(filtriranaLista);
+            });
+        }, error -> Platform.runLater(() -> System.err.println("Greška pretraga: " + error.getMessage())));
     }
 
     @FXML

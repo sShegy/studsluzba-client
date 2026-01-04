@@ -64,7 +64,7 @@
     </HBox>
 
     <!-- TABOVI -->
-    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+    <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
             <!-- TAB 1: LIČNI PODACI -->
             <Tab text="Lični Podaci">

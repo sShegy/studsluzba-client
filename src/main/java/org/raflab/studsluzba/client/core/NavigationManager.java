@@ -20,15 +20,18 @@ import java.util.function.Consumer;
 public class NavigationManager {
 
     private final SpringFXMLLoader springFXMLLoader;
-    private BorderPane mainLayout; // Glavni kontejner gde se menjaju ekrani
+    private BorderPane mainLayout;
 
-    // Stack za istoriju (Back i Forward)
+    // Stack za istoriju
     private final Stack<NavigationState> backStack = new Stack<>();
     private final Stack<NavigationState> forwardStack = new Stack<>();
 
     private NavigationState currentState;
 
-    @Value("${app.history.max-depth:10}")
+    // Zastavica da sprečimo petlju (da listener ne reaguje kad mi programski menjamo tab)
+    private boolean isNavigating = false;
+
+    @Value("${app.history.max-depth:20}")
     private int maxHistoryDepth;
 
     public NavigationManager(SpringFXMLLoader springFXMLLoader) {
@@ -40,6 +43,11 @@ public class NavigationManager {
         setupGlobalEventHandlers(scene);
     }
 
+    public boolean isNavigating() {
+        return isNavigating;
+    }
+
+    // Standardna navigacija (Menja celi ekran)
     public void navigateTo(String fxmlPath) {
         navigateTo(fxmlPath, null);
     }
@@ -47,30 +55,58 @@ public class NavigationManager {
     public void navigateTo(String fxmlPath, Consumer<Object> controllerSetup) {
         if (currentState != null) {
             backStack.push(currentState);
-
-            // Ograničenje istorije na osnovu konfiguracije
             if (backStack.size() > maxHistoryDepth) {
-                backStack.remove(0); // Izbacujemo najstariji element
+                backStack.remove(0);
             }
         }
-        forwardStack.clear(); // Nova grana, brišemo forward
+        forwardStack.clear();
         loadView(fxmlPath, controllerSetup);
+    }
+
+    /**
+     * KLJUČNA METODA ZA TABOVE:
+     * Beleži promenu stanja (npr. promena taba) bez ponovnog učitavanja FXML-a.
+     */
+    public void recordStateChange(Consumer<Object> newStateSetup) {
+        if (isNavigating) return; // Ne beleži ako se upravo vraćamo nazad/napred
+
+        if (currentState != null) {
+            // Gurnemo STARO stanje u istoriju
+            backStack.push(currentState);
+            if (backStack.size() > maxHistoryDepth) backStack.remove(0);
+        }
+        // Brišemo forward jer smo napravili novu granu
+        forwardStack.clear();
+
+        // Ažuriramo trenutno stanje da reflektuje NOVI tab
+        // Koristimo isti FXML path, ali novi setup (koji selektuje novi tab)
+        currentState = new NavigationState(currentState.fxmlPath, newStateSetup);
     }
 
     public void goBack() {
         if (backStack.isEmpty()) return;
 
-        forwardStack.push(currentState);
-        NavigationState previous = backStack.pop();
-        loadView(previous.fxmlPath, previous.controllerSetup);
+        isNavigating = true; // Blokiramo beleženje novih stanja dok se vraćamo
+        try {
+            forwardStack.push(currentState);
+            NavigationState previous = backStack.pop();
+            loadView(previous.fxmlPath, previous.controllerSetup);
+        } finally {
+            isNavigating = false;
+        }
     }
 
     public void goForward() {
         if (forwardStack.isEmpty()) return;
 
-        backStack.push(currentState);
-        NavigationState next = forwardStack.pop();
-        loadView(next.fxmlPath, next.controllerSetup);
+        isNavigating = true;
+        try {
+            backStack.push(currentState);
+            NavigationState next = forwardStack.pop();
+            loadView(next.fxmlPath, next.controllerSetup);
+        } finally {
+            isNavigating = false;
+        }
     }
 
     private void loadView(String fxmlPath, Consumer<Object> controllerSetup) {
@@ -83,8 +119,8 @@ public class NavigationManager {
             }
 
             mainLayout.setCenter(view);
-
             currentState = new NavigationState(fxmlPath, controllerSetup);
+
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Greška pri učitavanju FXML-a: " + fxmlPath);
@@ -92,6 +128,7 @@ public class NavigationManager {
     }
 
     private void setupGlobalEventHandlers(Scene scene) {
+        // Miš (Back/Forward dugmići)
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (event.getButton() == MouseButton.BACK) {
                 goBack();
@@ -102,7 +139,7 @@ public class NavigationManager {
             }
         });
 
-        // Tastatura (Ctrl + [ za nazad, Ctrl + ] za napred)
+        // Tastatura (Ctrl + [ i Ctrl + ])
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown()) {
                 if (event.getCode() == KeyCode.OPEN_BRACKET) {
