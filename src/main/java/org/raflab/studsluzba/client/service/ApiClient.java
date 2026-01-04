@@ -1,12 +1,13 @@
 package org.raflab.studsluzba.client.service;
 
-import org.raflab.studsluzba.client.dto.PredmetDTO;
-import org.raflab.studsluzba.client.dto.sifarnik.response.SrednjaSkolaResponseDTO;
-import org.raflab.studsluzba.client.dto.student.request.CreateUplataRequestDTO;
-import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
-import org.raflab.studsluzba.client.dto.student.response.StanjeFinansijaResponseDTO;
-import org.raflab.studsluzba.client.dto.student.response.StudentProfileResponseDTO;
-import org.raflab.studsluzba.client.dto.student.response.UpisanaGodinaResponseDTO;
+import org.raflab.studsluzba.dto.PredmetDTO;
+import org.raflab.studsluzba.dto.sifarnik.response.SrednjaSkolaResponseDTO;
+import org.raflab.studsluzba.dto.skolskagodina.response.SkolskaGodinaResponseDTO;
+import org.raflab.studsluzba.dto.student.request.CreateUplataRequestDTO;
+import org.raflab.studsluzba.dto.student.response.PolozenIspitResponseDTO;
+import org.raflab.studsluzba.dto.student.response.StanjeFinansijaResponseDTO;
+import org.raflab.studsluzba.dto.student.response.StudentProfileResponseDTO;
+import org.raflab.studsluzba.dto.student.response.UpisanaGodinaResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -96,18 +97,50 @@ public class ApiClient {
                 .bodyToFlux(PredmetDTO.class);
     }
     // 9. Dohvatanje svih studijskih programa
-    public Flux<org.raflab.studsluzba.client.dto.kurikulum.response.StudijskiProgramResponseDTO> getStudijskiProgrami() {
+    public Flux<org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO> getStudijskiProgrami() {
         return this.webClient.get()
                 .uri("/kurikulum/studijski-programi")
                 .retrieve()
-                .bodyToFlux(org.raflab.studsluzba.client.dto.kurikulum.response.StudijskiProgramResponseDTO.class);
+                .bodyToFlux(org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO.class);
     }
 
     // 10. Dohvatanje predmeta za određeni studijski program
-    public Flux<org.raflab.studsluzba.client.dto.kurikulum.response.PredmetDetaljiResponseDTO> getPredmetiByProgram(Long programId) {
+    public Flux<org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO> getPredmetiByProgram(Long programId) {
         return this.webClient.get()
                 .uri("/kurikulum/studijski-programi/" + programId + "/predmeti")
                 .retrieve()
-                .bodyToFlux(org.raflab.studsluzba.client.dto.kurikulum.response.PredmetDetaljiResponseDTO.class);
+                .bodyToFlux(org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO.class);
+    }
+    // 11. Upis godine
+    public Mono<Void> upisGodine(org.raflab.studsluzba.dto.student.request.UpisGodineRequestDTO request) {
+        return this.webClient.post()
+                .uri("/karijera/upis-godine")  // <--- PROMENI OVO (bilo je /studenti/...)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
+    // 12. Obnova godine
+    public Mono<Void> obnovaGodine(org.raflab.studsluzba.dto.student.request.ObnovaGodineRequestDTO request) {
+        return this.webClient.post()
+                .uri("/karijera/obnova-godine") // <--- PROMENI OVO (bilo je /studenti/...)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
+    // 13. Dohvatanje aktivnih školskih godina (za ComboBox u dijalogu)
+    public Flux<SkolskaGodinaResponseDTO> getAllSkolskeGodine() {
+        return this.webClient.get()
+                .uri("/skolske-godine") // <--- PROMENJENO: Sklonjeno "/aktivne" da vidimo i buduće
+                .retrieve()
+                .bodyToFlux(SkolskaGodinaResponseDTO.class);
+    }
+    // 14. Dohvatanje obnovljenih godina
+    public Flux<UpisanaGodinaResponseDTO> getObnovljeneGodine(Long indeksId) {
+        return this.webClient.get()
+                .uri("/karijera/" + indeksId + "/obnovljene-godine")
+                .retrieve()
+                .bodyToFlux(UpisanaGodinaResponseDTO.class);
     }
 }

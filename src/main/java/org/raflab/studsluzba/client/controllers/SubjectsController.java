@@ -7,8 +7,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.raflab.studsluzba.client.dto.kurikulum.response.PredmetDetaljiResponseDTO;
-import org.raflab.studsluzba.client.dto.kurikulum.response.StudijskiProgramResponseDTO;
+import org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO;
+import org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO;
 import org.raflab.studsluzba.client.service.ApiClient;
 import org.springframework.stereotype.Controller;
 

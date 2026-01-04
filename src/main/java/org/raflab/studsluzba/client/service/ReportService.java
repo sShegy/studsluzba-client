@@ -3,7 +3,7 @@ package org.raflab.studsluzba.client.service;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
-import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
+import org.raflab.studsluzba.dto.student.response.PolozenIspitResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;

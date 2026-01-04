@@ -3,22 +3,29 @@ package org.raflab.studsluzba.client.controllers;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.raflab.studsluzba.client.core.NavigationManager;
-import org.raflab.studsluzba.client.dto.PredmetDTO;
-import org.raflab.studsluzba.client.dto.student.request.CreateUplataRequestDTO;
-import org.raflab.studsluzba.client.dto.student.response.PolozenIspitResponseDTO;
-import org.raflab.studsluzba.client.dto.student.response.UpisanaGodinaResponseDTO;
+import org.raflab.studsluzba.dto.PredmetDTO;
+import org.raflab.studsluzba.dto.skolskagodina.response.SkolskaGodinaResponseDTO;
+import org.raflab.studsluzba.dto.student.request.CreateUplataRequestDTO;
+import org.raflab.studsluzba.dto.student.request.ObnovaGodineRequestDTO;
+import org.raflab.studsluzba.dto.student.request.UpisGodineRequestDTO;
+import org.raflab.studsluzba.dto.student.response.PolozenIspitResponseDTO;
+import org.raflab.studsluzba.dto.student.response.UpisanaGodinaResponseDTO;
 import org.raflab.studsluzba.client.service.ApiClient;
 import org.raflab.studsluzba.client.service.ReportService;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -116,12 +123,10 @@ public class StudentProfileController {
                     loadTokStudija(student.getIndeksId());
                     loadFinansije(student.getIndeksId());
                 } else {
-                    System.err.println("UPOZORENJE: Student nema aktivan indeks ID!");
+                    showError("Upozorenje", "Student nema aktivan indeks ID!");
                 }
             });
-        }, error -> {
-            Platform.runLater(() -> System.err.println("Greška pri učitavanju studenta: " + error.getMessage()));
-        });
+        }, error -> showError("Greška", "Greška pri učitavanju studenta: " + error.getMessage()));
     }
 
     private void loadIspiti(Long indeksId) {
@@ -133,7 +138,6 @@ public class StudentProfileController {
                             ispitiTable.getItems().setAll(ispiti);
 
                             // --- FIX: Filtriramo samo ispite koji imaju unetu ocenu i ESPB ---
-                            // Ovo sprečava NullPointerException ako je ocena null
                             var validniIspiti = ispiti.stream()
                                     .filter(i -> i.getOcena() != null && i.getEspb() != null)
                                     .toList();
@@ -151,7 +155,7 @@ public class StudentProfileController {
                             }
                         }
                     });
-                }, error -> Platform.runLater(() -> System.err.println("Greška ispiti: " + error.getMessage())));
+                }, error -> showError("Greška", "Greška pri učitavanju ispita: " + error.getMessage()));
     }
 
     private void loadNepolozeni(Long indeksId) {
@@ -163,19 +167,47 @@ public class StudentProfileController {
                             nepolozeniTable.getItems().setAll(predmeti);
                         }
                     });
-                }, error -> Platform.runLater(() -> System.err.println("Greška nepoloženi: " + error.getMessage())));
+                }, error -> showError("Greška", "Greška pri učitavanju nepoloženih ispita: " + error.getMessage()));
     }
 
     private void loadTokStudija(Long indeksId) {
-        apiClient.getUpisaneGodine(indeksId)
-                .collectList()
-                .subscribe(godine -> {
-                    Platform.runLater(() -> {
-                        if (tokStudijaTable != null) {
-                            tokStudijaTable.getItems().setAll(godine);
-                        }
+        // 1. Prvo dohvatamo UPISANE godine
+        apiClient.getUpisaneGodine(indeksId).collectList().subscribe(upisi -> {
+
+            // 2. Odmah zatim dohvatamo OBNOVLJENE godine
+            apiClient.getObnovljeneGodine(indeksId).collectList().subscribe(obnove -> {
+
+                Platform.runLater(() -> {
+                    // Pravimo novu listu
+                    java.util.List<UpisanaGodinaResponseDTO> sveGodine = new java.util.ArrayList<>();
+
+                    // Ubacujemo upise i ručno postavljamo TIP
+                    for (UpisanaGodinaResponseDTO u : upisi) {
+                        u.setTip("Upis"); // <--- OVO REŠAVA PRAZNU KOLONU
+                        sveGodine.add(u);
+                    }
+
+                    // Ubacujemo obnove i ručno postavljamo TIP
+                    for (UpisanaGodinaResponseDTO o : obnove) {
+                        o.setTip("Obnova"); // <--- OVO REŠAVA PRAZNU KOLONU
+                        sveGodine.add(o);
+                    }
+
+                    // Sortiramo (najnovije gore)
+                    sveGodine.sort((g1, g2) -> {
+                        if (g1.getDatumUpisa() == null || g2.getDatumUpisa() == null) return 0;
+                        return g2.getDatumUpisa().compareTo(g1.getDatumUpisa());
                     });
-                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju toka studija: " + error.getMessage())));
+
+                    // --- NASILNO AŽURIRANJE TABELE ---
+                    tokStudijaTable.getItems().clear(); // 1. Obriši sve staro
+                    tokStudijaTable.getItems().addAll(sveGodine); // 2. Ubaci novo
+                    tokStudijaTable.refresh(); // 3. Osveži prikaz
+                });
+
+            }, error -> showError("Greška", "Neuspešno učitavanje obnova: " + error.getMessage()));
+
+        }, error -> showError("Greška", "Neuspešno učitavanje upisa: " + error.getMessage()));
     }
 
     private void loadFinansije(Long indeksId) {
@@ -186,9 +218,154 @@ public class StudentProfileController {
                         lblUplaceno.setText(stanje.getUkupnoUplaceno() + " RSD");
                         lblStanje.setText(stanje.getPreostaloZaUplatu() + " RSD");
                     });
-                }, error -> Platform.runLater(() -> System.err.println("Greška pri učitavanju finansija: " + error.getMessage())));
+                }, error -> showError("Greška", "Greška pri učitavanju finansija: " + error.getMessage()));
     }
+    @FXML
+    public void onUpisGodine() {
+        if (this.currentIndeksId == null) return;
 
+        // 1. Određujemo NAREDNU godinu studija (Max iz tabele + 1)
+        int maxGodina = 0;
+        if (tokStudijaTable.getItems() != null) {
+            maxGodina = tokStudijaTable.getItems().stream()
+                    .mapToInt(UpisanaGodinaResponseDTO::getGodinaKojaSeUpisuje)
+                    .max()
+                    .orElse(0);
+        }
+
+        final int godinaZaUpis = maxGodina + 1;
+
+        // PRAVILO: Osnovne studije traju 4 godine
+        if (godinaZaUpis > 4) {
+            showError("Kraj studija", "Student je već završio 4. godinu.\nNije moguć dalji upis, koristite opciju 'Obnova Godine'.");
+            return;
+        }
+
+        // 2. Dohvatamo sve školske godine sa servera
+        apiClient.getAllSkolskeGodine().collectList().subscribe(godine -> {
+            Platform.runLater(() -> {
+
+                // 3. Sakupljamo nazive godina koje je student VEĆ upisao/obnovio
+                java.util.Set<String> zauzeteSkolskeGodine = new java.util.HashSet<>();
+                if (tokStudijaTable.getItems() != null) {
+                    tokStudijaTable.getItems().forEach(red -> zauzeteSkolskeGodine.add(red.getSkolskaGodina()));
+                }
+
+                // 4. Tražimo prvu godinu koja je AKTIVNA i NIJE ZAUZETA
+                SkolskaGodinaResponseDTO predlozenaGodina = godine.stream()
+                        .filter(SkolskaGodinaResponseDTO::isAktivna) // Mora biti aktivna u bazi
+                        .filter(sg -> !zauzeteSkolskeGodine.contains(sg.getNaziv())) // Ne sme biti već u tabeli
+                        .findFirst()
+                        .orElse(null);
+
+                if (predlozenaGodina == null) {
+                    showError("Nema dostupnih godina", "Nema narednih aktivnih školskih godina u koje student može da se upiše.");
+                    return;
+                }
+
+                // 5. Kreiramo dijalog sa tom jednom opcijom
+                ChoiceDialog<SkolskaGodinaResponseDTO> dialog = new ChoiceDialog<>(predlozenaGodina, java.util.List.of(predlozenaGodina));
+                dialog.setTitle("Upis Godine");
+                dialog.setHeaderText("Upis u " + godinaZaUpis + ". godinu studija.");
+                dialog.setContentText("Školska godina:");
+
+                // Lep ispis objekta u meniju
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == ButtonType.OK) return dialog.getSelectedItem();
+                    return null;
+                });
+
+                Optional<SkolskaGodinaResponseDTO> result = dialog.showAndWait();
+
+                // 6. Slanje zahteva na server
+                result.ifPresent(selectedGodina -> {
+                    UpisGodineRequestDTO request = new UpisGodineRequestDTO();
+                    request.setStudentIndeksId(this.currentIndeksId);
+                    request.setSkolskaGodinaId(selectedGodina.getId());
+                    request.setGodinaKojaSeUpisuje(godinaZaUpis);
+                    request.setPredmetiKojeUpisujeIds(new ArrayList<>()); // Server dodaje obavezne predmete
+
+                    apiClient.upisGodine(request).subscribe(
+                            success -> {
+                                Platform.runLater(() -> {
+                                    showSuccess("Uspešno upisana " + godinaZaUpis + ". godina (" + selectedGodina.getNaziv() + ")!");
+                                    // KLJUČNO: Odmah osvežavamo tabelu da bi se video novi red
+                                    loadTokStudija(this.currentIndeksId);
+                                });
+                            },
+                            error -> showError("Greška pri upisu", error.getMessage())
+                    );
+                });
+            });
+        }, error -> showError("Greška", "Neuspešno učitavanje školskih godina: " + error.getMessage()));
+    }
+    @FXML
+    public void onObnovaGodine() {
+        if (this.currentIndeksId == null) return;
+
+        int godinaZaObnovu = 1;
+        if (tokStudijaTable.getItems() != null && !tokStudijaTable.getItems().isEmpty()) {
+            godinaZaObnovu = tokStudijaTable.getItems().stream()
+                    .mapToInt(UpisanaGodinaResponseDTO::getGodinaKojaSeUpisuje)
+                    .max()
+                    .orElse(1);
+        }
+        final int finalGodinaZaObnovu = godinaZaObnovu;
+
+        apiClient.getAllSkolskeGodine().collectList().subscribe(godine -> {
+            Platform.runLater(() -> {
+
+                // --- PAMETNA LOGIKA ---
+                java.util.Set<String> iskorisceneGodine = new java.util.HashSet<>();
+                if (tokStudijaTable.getItems() != null) {
+                    tokStudijaTable.getItems().forEach(red -> iskorisceneGodine.add(red.getSkolskaGodina()));
+                }
+
+                SkolskaGodinaResponseDTO sledecaSlobodnaGodina = godine.stream()
+                        .filter(SkolskaGodinaResponseDTO::isAktivna)
+                        .filter(sg -> !iskorisceneGodine.contains(sg.getNaziv()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (sledecaSlobodnaGodina == null) {
+                    showError("Nema dostupnih godina", "Nema narednih aktivnih školskih godina za obnovu.");
+                    return;
+                }
+
+                ChoiceDialog<SkolskaGodinaResponseDTO> dialog = new ChoiceDialog<>(sledecaSlobodnaGodina, java.util.List.of(sledecaSlobodnaGodina));
+                dialog.setTitle("Obnova Godine");
+                dialog.setHeaderText("Obnova " + finalGodinaZaObnovu + ". godine studija.");
+                dialog.setContentText("Školska godina:");
+
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == ButtonType.OK) {
+                        return dialog.getSelectedItem();
+                    }
+                    return null;
+                });
+
+                Optional<SkolskaGodinaResponseDTO> result = dialog.showAndWait();
+
+                result.ifPresent(selectedGodina -> {
+                    ObnovaGodineRequestDTO request = new ObnovaGodineRequestDTO();
+                    request.setStudentIndeksId(this.currentIndeksId);
+                    request.setSkolskaGodinaId(selectedGodina.getId());
+                    request.setGodinaKojaSeObnavlja(finalGodinaZaObnovu);
+                    request.setPredmetiIzNaredneGodineIds(new ArrayList<>());
+
+                    apiClient.obnovaGodine(request).subscribe(
+                            success -> {
+                                Platform.runLater(() -> {
+                                    showSuccess("Uspešno obnovljena " + finalGodinaZaObnovu + ". godina (" + selectedGodina.getNaziv() + ")!");
+                                    loadTokStudija(this.currentIndeksId);
+                                });
+                            },
+                            error -> showError("Greška pri obnovi", error.getMessage())
+                    );
+                });
+            });
+        }, error -> showError("Greška", "Neuspešno učitavanje školskih godina: " + error.getMessage()));
+    }
     @FXML
     public void onNovaUplata() {
         if (this.currentIndeksId == null) return;
@@ -211,24 +388,13 @@ public class StudentProfileController {
 
                 apiClient.addUplata(request).subscribe(response -> {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("Uspeh");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Uplata uspešno evidentirana!");
-                        alert.showAndWait();
+                        showSuccess("Uplata uspešno evidentirana!");
                         loadFinansije(this.currentIndeksId);
                     });
-                }, error -> Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Greška");
-                    alert.setContentText("Neuspešna uplata: " + error.getMessage());
-                    alert.showAndWait();
-                }));
+                }, error -> showError("Greška", "Neuspešna uplata: " + error.getMessage()));
 
             } catch (NumberFormatException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText("Morate uneti validan broj!");
-                alert.showAndWait();
+                showError("Greška", "Morate uneti validan broj!");
             }
         });
     }
@@ -240,11 +406,7 @@ public class StudentProfileController {
             String indeks = lblIndeks.getText();
             reportService.generateUverenje(ime, indeks, "Osnovne akademske studije");
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Greška");
-            alert.setHeaderText("Greška pri štampi");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            showError("Greška pri štampi", e.getMessage());
         }
     }
 
@@ -263,7 +425,6 @@ public class StudentProfileController {
                 return;
             }
 
-
             for (PolozenIspitResponseDTO ispit : listaIspita) {
                 if (ispit.getGodinaStudija() == null) {
                     ispit.setGodinaStudija(1); // Stavljamo sve u prvu godinu
@@ -280,14 +441,33 @@ public class StudentProfileController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Greška pri štampi: " + e.getMessage());
-            alert.showAndWait();
+            showError("Greška pri štampi", e.getMessage());
         }
     }
 
     @FXML
     public void onBack() {
         navigationManager.goBack();
+    }
+
+    // --- POMOĆNE METODE ZA ALERTE ---
+    private void showError(String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
+    private void showSuccess(String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Uspeh");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }
