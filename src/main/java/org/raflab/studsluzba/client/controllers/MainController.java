@@ -23,16 +23,12 @@ public class MainController {
         navigationManager.navigateTo("/fxml/StudentSearch.fxml");
     }
 
-    @FXML
-    public void onPredmetiClick() {
-        navigationManager.navigateTo("/fxml/Subjects.fxml");
+    @FXML private void onStudijskiProgramClick(){
+        navigationManager.navigateTo("/fxml/StudijskiProgram.fxml");
     }
+
     @FXML
     public void onIspitiClick() {
         System.out.println("Kliknuto na Ispiti");
-    }
-
-    @FXML private void onStudijskiProgramClick(){
-        navigationManager.navigateTo("/fxml/StudijskiProgram.fxml");
     }
 }

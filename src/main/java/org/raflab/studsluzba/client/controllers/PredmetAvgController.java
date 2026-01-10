@@ -90,6 +90,7 @@ public class PredmetAvgController {
 //            boolean success = job.printPage(tabelaProsek);
 //            if (success) { job.endJob(); }
 //        }
+        // komentar proba
     }
 
     @FXML
