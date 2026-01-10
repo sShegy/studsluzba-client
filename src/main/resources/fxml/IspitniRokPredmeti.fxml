@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.IspitniRokPredmetiController">
+    <children>
+        <Button layoutX="14.0" layoutY="14.0" onAction="#handleBack" text="Nazad na Rokove" />
+        <Label fx:id="lblNaslov" layoutX="250.0" layoutY="18.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Ispiti za rok: " />
+
+        <TableView fx:id="tabelaIspita" layoutX="50.0" layoutY="60.0" prefHeight="450.0" prefWidth="700.0">
+            <columns>
+                <TableColumn fx:id="colSifra" prefWidth="150.0" text="Šifra Predmeta" />
+                <TableColumn fx:id="colNaziv" prefWidth="350.0" text="Naziv Predmeta" />
+                <TableColumn fx:id="colDatum" prefWidth="200.0" text="Datum Ispita" />
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>
