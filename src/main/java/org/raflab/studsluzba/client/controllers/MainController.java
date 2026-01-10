@@ -21,7 +21,6 @@ public class MainController {
     @FXML
     public void onStudentiClick() {
         navigationManager.navigateTo("/fxml/StudentSearch.fxml");
-
     }
 
     @FXML
@@ -31,5 +30,9 @@ public class MainController {
     @FXML
     public void onIspitiClick() {
         System.out.println("Kliknuto na Ispiti");
+    }
+
+    @FXML private void onStudijskiProgramClick(){
+        navigationManager.navigateTo("/fxml/StudijskiProgram.fxml");
     }
 }

@@ -9,7 +9,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import org.raflab.studsluzba.client.utils.SpringFXMLLoader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,6 +23,9 @@ public class NavigationManager {
 
     private final SpringFXMLLoader springFXMLLoader;
     private BorderPane mainLayout;
+
+//    @Autowired
+//    private ConfigurableApplicationContext context;
 
     // Stack za istoriju
     private final Stack<NavigationState> backStack = new Stack<>();
@@ -63,10 +68,6 @@ public class NavigationManager {
         loadView(fxmlPath, controllerSetup);
     }
 
-    /**
-     * KLJUČNA METODA ZA TABOVE:
-     * Beleži promenu stanja (npr. promena taba) bez ponovnog učitavanja FXML-a.
-     */
     public void recordStateChange(Consumer<Object> newStateSetup) {
         if (isNavigating) return; // Ne beleži ako se upravo vraćamo nazad/napred
 
@@ -86,7 +87,7 @@ public class NavigationManager {
     public void goBack() {
         if (backStack.isEmpty()) return;
 
-        isNavigating = true; // Blokiramo beleženje novih stanja dok se vraćamo
+        isNavigating = true;
         try {
             forwardStack.push(currentState);
             NavigationState previous = backStack.pop();
@@ -112,6 +113,7 @@ public class NavigationManager {
     private void loadView(String fxmlPath, Consumer<Object> controllerSetup) {
         try {
             FXMLLoader loader = springFXMLLoader.load(fxmlPath);
+
             Parent view = loader.load();
 
             if (controllerSetup != null) {

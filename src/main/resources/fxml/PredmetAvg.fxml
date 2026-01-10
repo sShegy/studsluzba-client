@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.raflab.studsluzba.client.controllers.PredmetAvgController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="← Nazad" onAction="#handleBack" style="-fx-background-color: #f30000; -fx-text-fill: #ffffff; -fx-cursor: hand;"/>
+        <Label text="Prosečne ocene po predmetima">
+            <font><Font name="System Bold" size="20.0" /></font>
+        </Label>
+    </HBox>
+
+    <HBox spacing="15.0" alignment="CENTER_LEFT" style="-fx-background-color: #ecf0f1; -fx-padding: 10;">
+        <Label text="Godina od:" />
+        <TextField fx:id="txtGodinaOd" prefWidth="70.0" promptText="2020" />
+        <Label text="Godina do:" />
+        <TextField fx:id="txtGodinaDo" prefWidth="70.0" promptText="2024" />
+        <Button text="Primeni filter" onAction="#handleRefresh" style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="🖨 Štampaj izveštaj" onAction="#handlePrint" style="-fx-background-color: #2ecc71; -fx-text-fill: white;" />
+    </HBox>
+
+    <TableView fx:id="tabelaProsek" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colSifra" prefWidth="100.0" text="Šifra" />
+            <TableColumn fx:id="colNaziv" prefWidth="300.0" text="Naziv predmeta" />
+            <TableColumn fx:id="colProsek" prefWidth="120.0" text="Prosečna ocena" />
+        </columns>
+    </TableView>
+</VBox>

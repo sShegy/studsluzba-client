@@ -1,6 +1,9 @@
 package org.raflab.studsluzba.client.service;
 
 import org.raflab.studsluzba.dto.PredmetDTO;
+import org.raflab.studsluzba.dto.kurikulum.request.CreatePredmetRequestDTO;
+import org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO;
+import org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO;
 import org.raflab.studsluzba.dto.sifarnik.response.SrednjaSkolaResponseDTO;
 import org.raflab.studsluzba.dto.skolskagodina.response.SkolskaGodinaResponseDTO;
 import org.raflab.studsluzba.dto.student.request.CreateUplataRequestDTO;
@@ -111,6 +114,7 @@ public class ApiClient {
                 .retrieve()
                 .bodyToFlux(org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO.class);
     }
+
     // 11. Upis godine
     public Mono<Void> upisGodine(org.raflab.studsluzba.dto.student.request.UpisGodineRequestDTO request) {
         return this.webClient.post()
@@ -136,11 +140,46 @@ public class ApiClient {
                 .retrieve()
                 .bodyToFlux(SkolskaGodinaResponseDTO.class);
     }
-    // 14. Dohvatanje obnovljenih godina
+
+    public Flux<StudijskiProgramResponseDTO> getAllStudijskiProgrami() {
+        return this.webClient.get()
+                .uri("/kurikulum/studijski-programi")
+                .retrieve()
+                .bodyToFlux(StudijskiProgramResponseDTO.class);
+    }
+
     public Flux<UpisanaGodinaResponseDTO> getObnovljeneGodine(Long indeksId) {
         return this.webClient.get()
                 .uri("/karijera/" + indeksId + "/obnovljene-godine")
                 .retrieve()
                 .bodyToFlux(UpisanaGodinaResponseDTO.class);
+    }
+
+    public Mono<Double> getProsekZaPredmet(Long predmetId, Integer godinaOd, Integer godinaDo){
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/kurikulum/predmeti/{id}/prosek")
+                        .queryParam("godinaOd", godinaOd)
+                        .queryParam("godinaDo", godinaDo)
+                        .build(predmetId))
+                .retrieve()
+                .bodyToMono(Double.class);
+    }
+
+    public Mono<Long> addPredmet(Long programId, String sifra, String naziv, Integer espb, Integer semestar) {
+        CreatePredmetRequestDTO request = new CreatePredmetRequestDTO(programId, sifra, naziv, espb, semestar);
+
+        return this.webClient.post()
+                .uri("/kurikulum/predmeti")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
+
+    public Flux<PredmetDetaljiResponseDTO> getPredmetiByStudijskiProgram(Long programId) {
+        return this.webClient.get()
+                .uri("/kurikulum/studijski-programi/{id}/predmeti", programId)
+                .retrieve()
+                .bodyToFlux(PredmetDetaljiResponseDTO.class);
     }
 }

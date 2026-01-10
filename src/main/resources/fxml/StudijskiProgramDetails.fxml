@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.raflab.studsluzba.client.controllers.StudijskiProgramDetailsController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label fx:id="lblNazivPrograma" text="Naziv Studijskog Programa">
+        <font>
+            <Font name="System Bold" size="24.0" />
+        </font>
+    </Label>
+
+    <HBox spacing="20.0" alignment="CENTER_LEFT" style="-fx-background-color: #f4f4f4; -fx-padding: 10;">
+        <children>
+            <VBox>
+                <Label text="Oznaka" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblOznaka" text="-" />
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox>
+                <Label text="Godina" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblGodina" text="-" />
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox>
+                <Label text="Zvanje" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblZvanje" text="-" />
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox style="-fx-text-alignment: center">
+                <Label text="Trajanje (sem)" style="-fx-font-weight: bold; -fx-background-color: #23ff00; -fx-text-fill: #ffffff"/>
+                <Label fx:id="lblTrajanje" text="-" />
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox>
+                <Button text="Prosek" onAction="#handleAvg"
+                        style="-fx-background-color: #3498db; -fx-text-fill: #ffffff; -fx-cursor: hand;">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox>
+            <Button text="← Nazad " onAction="#handleBack"
+                    style="-fx-background-color: #f30000; -fx-text-fill: #ffffff; -fx-cursor: hand;">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Button>
+            </VBox>
+        </children>
+    </HBox>
+
+    <TableView fx:id="tabelaPredmeti" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colSifra" prefWidth="100.0" text="Šifra" />
+            <TableColumn fx:id="colNazivPredmeta" prefWidth="250.0" text="Naziv predmeta" />
+            <TableColumn fx:id="colEspb" prefWidth="80.0" text="ESPB" />
+            <TableColumn fx:id="colSemestar" prefWidth="80.0" text="Semestar" />
+        </columns>
+    </TableView>
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSifra" promptText="Šifra" prefWidth="80.0" />
+        <TextField fx:id="txtNaziv" promptText="Naziv novog predmeta" HBox.hgrow="ALWAYS" />
+        <TextField fx:id="txtEspb" promptText="ESPB" prefWidth="60.0" />
+        <TextField fx:id="txtSemestar" promptText="semestar" prefWidth="90.0" />
+        <Button onAction="#handleDodajPredmet" text="Dodaj predmet"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" />
+    </HBox>
+</VBox>

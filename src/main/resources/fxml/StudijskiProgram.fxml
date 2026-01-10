@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.StudijskiProgramController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label text="Studijski Programi">
+        <font>
+            <Font name="System Bold" size="24.0" />
+        </font>
+    </Label>
+
+    <TableView fx:id="tabelaStudijskiProgram" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colOznaka" prefWidth="100.00" text="Oznaka" />
+            <TableColumn fx:id="colNaziv" prefWidth="230.00" text="Naziv" />
+            <TableColumn fx:id="colGodinaAkreditacije" prefWidth="150.00" text = "Godina Akreditacije" />
+            <TableColumn fx:id="colNazivZvanja" prefWidth="350.00" text = "Naziv Zvanja"/>
+            <TableColumn fx:id="colTrajanjeSemestra" prefWidth="100.00" text="Trajanje Semestra"/>
+        </columns>
+    </TableView>
+</VBox>

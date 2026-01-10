@@ -42,6 +42,11 @@
                     <padding><Insets left="20.0" /></padding>
                     <font><Font size="14.0" /></font>
                 </Button>
+
+                <Button mnemonicParsing="false" onAction="#onStudijskiProgramClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="📝  Studijski Programi">
+                    <padding><Insets left="20.0" /></padding>
+                    <font><Font size="14.0" /></font>
+                </Button>
             </children>
         </VBox>
     </left>
