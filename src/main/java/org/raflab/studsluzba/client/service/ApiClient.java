@@ -38,9 +38,7 @@ public class ApiClient {
                 .bodyToFlux(StudentProfileResponseDTO.class);
     }
 
-    // ==================================================================================
-    // OSTALE METODE (Ostaju iste, samo ih kopiraj ili ostavi kako jesu)
-    // ==================================================================================
+
 
     public Mono<StudentProfileResponseDTO> getStudentById(Long id) {
         return this.webClient.get()
