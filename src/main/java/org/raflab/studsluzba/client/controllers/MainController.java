@@ -23,12 +23,19 @@ public class MainController {
         navigationManager.navigateTo("/fxml/StudentSearch.fxml");
     }
 
-    @FXML private void onStudijskiProgramClick(){
+    @FXML
+    public void onPredmetiClick() {
+        navigationManager.navigateTo("/fxml/Subjects.fxml");
+    }
+
+    @FXML
+    private void onStudijskiProgramClick(){
         navigationManager.navigateTo("/fxml/StudijskiProgram.fxml");
     }
 
     @FXML
     public void onIspitiClick() {
         System.out.println("Kliknuto na Ispiti");
+        // Ovde kasnije možeš dodati navigaciju ka ispitima ako napraviš FXML
     }
 }
