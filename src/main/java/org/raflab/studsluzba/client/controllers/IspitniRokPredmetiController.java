@@ -1,6 +1,8 @@
 package org.raflab.studsluzba.client.controllers;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -16,9 +18,10 @@ import org.springframework.stereotype.Controller;
 public class IspitniRokPredmetiController {
     @FXML private Label lblNaslov;
     @FXML private TableView<IspitResponseDTO> tabelaIspita;
-    @FXML private TableColumn<IspitResponseDTO, String> colSifra;
-    @FXML private TableColumn<IspitResponseDTO, String> colNaziv;
+    @FXML private TableColumn<IspitResponseDTO, String> colSifraPredmeta;
+    @FXML private TableColumn<IspitResponseDTO, String> colNazivPredmeta;
     @FXML private TableColumn<IspitResponseDTO, String> colDatum;
+    @FXML private TableColumn<IspitResponseDTO, String> colVreme;
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
@@ -37,20 +40,32 @@ public class IspitniRokPredmetiController {
         if (trenutniRok != null) {
             lblNaslov.setText("Ispiti za rok: " + trenutniRok.getNaziv());
 
-            colSifra.setCellValueFactory(new PropertyValueFactory<>("sifraPredmeta"));
-            colNaziv.setCellValueFactory(new PropertyValueFactory<>("nazivPredmeta"));
-            colDatum.setCellValueFactory(new PropertyValueFactory<>("vremeOdrzavanja"));
+//            colSifra.setCellValueFactory(new PropertyValueFactory<>("sifraPredmeta"));
+//            colNaziv.setCellValueFactory(new PropertyValueFactory<>("nazivPredmeta"));
+//            colDatum.setCellValueFactory(new PropertyValueFactory<>("vremeOdrzavanja"));
 
-            //osveziTabeluIspita();
+            colSifraPredmeta.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getPredmet().getSifra()));
+
+            colNazivPredmeta.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getPredmet().getNaziv()));
+
+            colDatum.setCellValueFactory(cellData ->
+                    new SimpleObjectProperty<>(cellData.getValue().getDatumOdrzavanja().toString()));
+
+            colVreme.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getVremePocetka().toString()));
+
+            osveziTabeluIspita();
         }
     }
 
-//    private void osveziTabeluIspita() {
-//        apiClient.getIspitiByRokId(trenutniRok.getId())
-//                .collectList()
-//                .subscribe(lista -> Platform.runLater(() -> tabelaIspita.getItems().setAll(lista)),
-//                        Throwable::printStackTrace);
-//    }
+    private void osveziTabeluIspita() {
+        apiClient.getIspitiByRokId(trenutniRok.getId())
+                .collectList()
+                .subscribe(lista -> Platform.runLater(() -> tabelaIspita.getItems().setAll(lista)),
+                        Throwable::printStackTrace);
+    }
 
     @FXML private void handleBack() {
         navigationManager.goBack();

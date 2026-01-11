@@ -95,6 +95,7 @@ public class StudentSearchController {
     public void onSearch() {
         currentPage = 0; // Nova pretraga uvek kreće od prve strane
         loadPage();
+        System.out.println("Kliknuto");
     }
 
     private void loadPage() {

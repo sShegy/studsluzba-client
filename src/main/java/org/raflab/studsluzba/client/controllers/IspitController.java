@@ -1,23 +1,26 @@
 package org.raflab.studsluzba.client.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.raflab.studsluzba.client.core.NavigationManager;
 import org.raflab.studsluzba.client.service.ApiClient;
 import org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO;
 import org.springframework.stereotype.Controller;
 
+import java.time.LocalDate;
+
 @Controller
 public class IspitController {
     @FXML private TableView<IspitniRokResponseDTO> tabelaRokova;
     @FXML private TableColumn<IspitniRokResponseDTO, String> colNaziv;
-    @FXML private TableColumn<IspitniRokResponseDTO, String> colPocetak;
-    @FXML private TableColumn<IspitniRokResponseDTO, String> colKraj;
+    @FXML private TableColumn<IspitniRokResponseDTO, LocalDate> colPocetak;
+    @FXML private TableColumn<IspitniRokResponseDTO, LocalDate> colKraj;
 
-    @FXML private TextField txtNaziv, txtPocetak, txtKraj;
+    @FXML private TextField txtNaziv;
+    @FXML private DatePicker datumPocetka, datumKraja;
+    @FXML private Button btnNazad;
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
@@ -31,9 +34,9 @@ public class IspitController {
     public void initialize() {
         colNaziv.setCellValueFactory(new PropertyValueFactory<>("naziv"));
         colPocetak.setCellValueFactory(new PropertyValueFactory<>("datumPocetka"));
-        colKraj.setCellValueFactory(new PropertyValueFactory<>("datumKraja"));
+        colKraj.setCellValueFactory(new PropertyValueFactory<>("datumZavrsetka"));
 
-        //osveziTabelu();
+        osveziTabelu();
 
         tabelaRokova.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -46,26 +49,26 @@ public class IspitController {
         });
     }
 
-//    private void osveziTabelu() {
-//        apiClient.getAllIspitniRokovi()
-//                .collectList()
-//                .subscribe(lista -> Platform.runLater(() -> tabelaRokova.getItems().setAll(lista)),
-//                        Throwable::printStackTrace);
-//    }
-//
-//    @FXML
-//    private void handleDodajRok() {
-//        String naziv = txtNaziv.getText();
-//        String pocetak = txtPocetak.getText();
-//        String kraj = txtKraj.getText();
-//
-//        apiClient.dodajIspitniRok(naziv, pocetak, kraj).subscribe(res -> {
-//            Platform.runLater(() -> {
-//                osveziTabelu();
-//                txtNaziv.clear(); txtPocetak.clear(); txtKraj.clear();
-//            });
-//        }, Throwable::printStackTrace);
-//    }
+    private void osveziTabelu() {
+        apiClient.getAllIspitniRokovi()
+                .collectList()
+                .subscribe(lista -> Platform.runLater(() -> tabelaRokova.getItems().setAll(lista)),
+                        Throwable::printStackTrace);
+    }
+
+    @FXML
+    private void handleAddNewIspitniRok() {
+        String naziv = txtNaziv.getText();
+        LocalDate pocetak = datumPocetka.getValue();
+        LocalDate kraj = datumKraja.getValue();
+
+        apiClient.dodajIspitniRok(naziv, pocetak, kraj).subscribe(res -> {
+            Platform.runLater(() -> {
+                osveziTabelu();
+                txtNaziv.clear(); datumPocetka.setValue(null); datumKraja.setValue(null);
+            });
+        }, Throwable::printStackTrace);
+    }
 
     @FXML private void handleBack() {
         navigationManager.goBack();

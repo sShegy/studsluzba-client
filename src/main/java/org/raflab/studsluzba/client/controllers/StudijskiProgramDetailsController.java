@@ -49,6 +49,9 @@ public class StudijskiProgramDetailsController {
 
         colSifra.setCellValueFactory(new PropertyValueFactory<>("sifra"));
         colNazivPredmeta.setCellValueFactory(new PropertyValueFactory<>("naziv"));
+//        colNazivPredmeta.setCellValueFactory(cellData ->
+//                new SimpleStringProperty(cellData.getValue().getPredmet().getNaziv())
+//        );
         colEspb.setCellValueFactory(new PropertyValueFactory<>("espb"));
         colSemestar.setCellValueFactory(new PropertyValueFactory<>("semestar"));
 

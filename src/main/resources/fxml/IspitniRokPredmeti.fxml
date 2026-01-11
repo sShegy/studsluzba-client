@@ -9,9 +9,10 @@
 
         <TableView fx:id="tabelaIspita" layoutX="50.0" layoutY="60.0" prefHeight="450.0" prefWidth="700.0">
             <columns>
-                <TableColumn fx:id="colSifra" prefWidth="150.0" text="Šifra Predmeta" />
-                <TableColumn fx:id="colNaziv" prefWidth="350.0" text="Naziv Predmeta" />
+                <TableColumn fx:id="colSifraPredmeta" prefWidth="150.0" text="Šifra Predmeta" />
+                <TableColumn fx:id="colNazivPredmeta" prefWidth="350.0" text="Naziv Predmeta" />
                 <TableColumn fx:id="colDatum" prefWidth="200.0" text="Datum Ispita" />
+                <TableColumn fx:id="colVreme" prefWidth="125.0" text="Vreme" />
             </columns>
         </TableView>
     </children>

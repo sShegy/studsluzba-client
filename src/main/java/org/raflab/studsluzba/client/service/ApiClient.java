@@ -2,6 +2,9 @@ package org.raflab.studsluzba.client.service;
 
 import org.raflab.studsluzba.dto.PredmetDTO;
 import org.raflab.studsluzba.dto.RestPage; // <--- OVO JE BITNO
+import org.raflab.studsluzba.dto.ispit.request.CreateIspitniRokRequestDTO;
+import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
+import org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.request.CreatePredmetRequestDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 
 @Service
 public class ApiClient {
@@ -37,8 +42,6 @@ public class ApiClient {
                 .retrieve()
                 .bodyToFlux(StudentProfileResponseDTO.class);
     }
-
-
 
     public Mono<StudentProfileResponseDTO> getStudentById(Long id) {
         return this.webClient.get()
@@ -175,7 +178,13 @@ public class ApiClient {
                 .bodyToFlux(PredmetDetaljiResponseDTO.class);
     }
 
-    // --- ISPITI (DODATO ZA TAČKU 3) ---
+    public Flux<IspitResponseDTO> getIspitiByRokId(Long rokId) {
+        return webClient.get()
+                .uri("/ispiti/rokovi/" + rokId)
+                .retrieve()
+                .bodyToFlux(IspitResponseDTO.class);
+    }
+
     public Flux<org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO> getIspitniRokovi() {
         return this.webClient.get()
                 .uri("/ispitni-rokovi")
@@ -196,5 +205,25 @@ public class ApiClient {
                 .uri("/ispiti/" + ispitId + "/rezultati")
                 .retrieve()
                 .bodyToFlux(org.raflab.studsluzba.dto.ispit.response.IspitRezultatResponseDTO.class);
+    }
+
+    public Flux<IspitniRokResponseDTO> getAllIspitniRokovi() {
+        return webClient.get()
+                .uri("/ispiti/rokovi")
+                .retrieve()
+                .bodyToFlux(IspitniRokResponseDTO.class);
+    }
+
+    public Mono<Long> dodajIspitniRok(String naziv, LocalDate pocetak, LocalDate kraj) {
+        CreateIspitniRokRequestDTO request = new CreateIspitniRokRequestDTO();
+        request.setNaziv(naziv);
+        request.setDatumPocetka(pocetak);
+        request.setDatumZavrsetka(kraj);
+
+        return webClient.post()
+                .uri("/ispiti/rokovi")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
     }
 }
