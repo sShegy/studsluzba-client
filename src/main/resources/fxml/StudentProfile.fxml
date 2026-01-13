@@ -150,7 +150,33 @@
                 </content>
             </Tab>
 
-            <!-- TAB 5: FINANSIJE -->
+            <!-- TAB 5: PRIJAVA ISPITA (NOVO) -->
+            <Tab text="Prijava Ispita">
+                <content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+
+                        <Label text="Dostupni ispiti za prijavu:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+                        <TableView fx:id="tblPrijavaIspita" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colPrijavaPredmet" prefWidth="250.0" text="Predmet" />
+                                <TableColumn fx:id="colPrijavaDatum" prefWidth="150.0" text="Datum" />
+                                <TableColumn fx:id="colPrijavaVreme" prefWidth="100.0" text="Vreme" />
+                                <!-- Kolona za dugme -->
+                                <TableColumn fx:id="colPrijavaAkcija" prefWidth="120.0" text="Akcija" />
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- TAB 6: FINANSIJE -->
             <Tab text="Finansije">
                 <content>
                     <VBox spacing="20.0" alignment="TOP_CENTER">

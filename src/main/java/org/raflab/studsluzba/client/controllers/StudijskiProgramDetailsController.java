@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @Component
 public class StudijskiProgramDetailsController {
+
     @FXML
     private Label lblNazivPrograma;
     @FXML
@@ -108,7 +109,7 @@ public class StudijskiProgramDetailsController {
             Integer semestar = Integer.valueOf(semestarRaw);
 
             if (!sifra.matches("^P[1-4]\\d{2}$")) {
-                displayError("Popunite pravilno polja!");
+                displayError("Popunite pravilno polja, sifra mora biti slovo P i tri broja, prvi je od 1 do 4!");
                 return;
             }
             if (semestar < 1 || semestar > 8) {
@@ -121,17 +122,17 @@ public class StudijskiProgramDetailsController {
             }
 
             apiClient.addPredmet(programId, sifra, naziv, espb, semestar).subscribe(noviId -> {
-                        Platform.runLater(() -> {
-                            refreshTable();
+                Platform.runLater(() -> {
+                    refreshTable();
 
-                            txtSifra.clear();
-                            txtNaziv.clear();
-                            txtEspb.clear();
-                            txtSemestar.clear();
+                    txtSifra.clear();
+                    txtNaziv.clear();
+                    txtEspb.clear();
+                    txtSemestar.clear();
 
-                            System.out.println("Predmet uspešno dodat sa ID: " + noviId);
-                        });
-                    }, error -> {
+                    System.out.println("Predmet uspešno dodat sa ID: " + noviId);
+                });
+            }, error -> {
                         Platform.runLater(() -> {
                             if (error instanceof org.springframework.web.reactive.function.client.WebClientResponseException.Conflict) {
                                 displayError("Šifra '" + sifra + "' već postoji!");
@@ -146,49 +147,49 @@ public class StudijskiProgramDetailsController {
         }
     }
 
-    private void displayError(String poruka) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Greška pri unosu");
-        alert.setHeaderText(null);
-        alert.setContentText(poruka);
-        alert.showAndWait();
-    }
+        private void displayError(String poruka) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Greška pri unosu");
+            alert.setHeaderText(null);
+            alert.setContentText(poruka);
+            alert.showAndWait();
+        }
 
-    @FXML
-    private void handleBack () {
-        navigationManager.goBack();
-    }
+        @FXML
+        private void handleBack () {
+            navigationManager.goBack();
+        }
 
-    @FXML
-    private void handleAvg () {
-        PredmetDTO selected = tabelaPredmeti.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            handleAvg(selected);
+        @FXML
+        private void handleAvg () {
+            PredmetDTO selected = tabelaPredmeti.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                handleAvg(selected);
+            }
+        }
+
+        private void handleAvg (PredmetDTO program){
+            PredmetAvgController.setPodatakZaPrikaz(program);
+            navigationManager.navigateTo("/fxml/PredmetAvg.fxml");
+        }
+
+        private void refreshTable() {
+            if (trenutniProgram == null)
+                return;
+
+            apiClient.getPredmetiByStudijskiProgram(trenutniProgram.getId())
+                    .map(details -> new PredmetDTO(
+                            details.getId(),
+                            details.getSifra(),
+                            details.getNaziv(),
+                            details.getEspb(),
+                            details.getSemestar()
+                    ))
+                    .collectList()
+                    .subscribe(lista -> {
+                        Platform.runLater(() -> {
+                            tabelaPredmeti.getItems().setAll(lista);
+                        });
+                    }, Throwable::printStackTrace);
         }
     }
-
-    private void handleAvg (PredmetDTO program){
-        PredmetAvgController.setPodatakZaPrikaz(program);
-        navigationManager.navigateTo("/fxml/PredmetAvg.fxml");
-    }
-
-    private void refreshTable() {
-        if (trenutniProgram == null)
-            return;
-
-        apiClient.getPredmetiByStudijskiProgram(trenutniProgram.getId())
-                .map(details -> new PredmetDTO(
-                        details.getId(),
-                        details.getSifra(),
-                        details.getNaziv(),
-                        details.getEspb(),
-                        details.getSemestar()
-                ))
-                .collectList()
-                .subscribe(lista -> {
-                    Platform.runLater(() -> {
-                        tabelaPredmeti.getItems().setAll(lista);
-                    });
-                }, Throwable::printStackTrace);
-    }
-}

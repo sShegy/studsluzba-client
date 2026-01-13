@@ -35,10 +35,11 @@ public class IspitniRokPredmetiController {
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
-
     private static IspitniRokResponseDTO trenutniRok;
 
-    public static void setTrenutniRok(IspitniRokResponseDTO rok) { trenutniRok = rok; }
+    public static void setTrenutniRok(IspitniRokResponseDTO rok) {
+        trenutniRok = rok;
+    }
 
     public IspitniRokPredmetiController(ApiClient apiClient, NavigationManager navigationManager) {
         this.apiClient = apiClient;
@@ -63,6 +64,14 @@ public class IspitniRokPredmetiController {
                     new SimpleStringProperty(cellData.getValue().getVremePocetka().toString()));
 
             refreshTable();
+
+//            apiClient.getSveVezeNastavnikPredmet()
+//                    .collectList()
+//                    .subscribe(lista -> Platform.runLater(() -> {
+//                        comboDrziPredmet.getItems().setAll(lista);
+//                    }), error -> {
+//                        Platform.runLater(() -> greskaLabel.setText("Greška pri učitavanju predmeta!"));
+//                    });
 
             apiClient.getSveVezeNastavnikPredmet()
                     .collectList()
@@ -91,13 +100,6 @@ public class IspitniRokPredmetiController {
             });
         }
     }
-    private void loadPrijavljeni(Long ispitId) {
-        apiClient.getPrijavljeniStudenti(ispitId)
-                .collectList()
-                .subscribe(lista -> Platform.runLater(() -> {
-                    tabelaPrijavljenih.getItems().setAll(lista);
-                }));
-    }
 
     private void refreshTable() {
         apiClient.getIspitiByRokId(trenutniRok.getId())
@@ -108,6 +110,22 @@ public class IspitniRokPredmetiController {
 
     @FXML private void handleBack() {
         navigationManager.goBack();
+    }
+
+    private void loadPrijavljeni(Long ispitId) {
+        apiClient.getPrijavljeniStudenti(ispitId)
+                .collectList()
+                .subscribe(lista -> Platform.runLater(() -> {
+                    tabelaPrijavljenih.getItems().setAll(lista);
+                }));
+    }
+
+    private void displayError(String poruka) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Informacija");
+        alert.setHeaderText(null);
+        alert.setContentText(poruka);
+        alert.showAndWait();
     }
 
     @FXML private void addNewIspit() {
@@ -150,12 +168,5 @@ public class IspitniRokPredmetiController {
                 dpDatum.setValue(null);
             });
         });
-    }
-    private void displayError(String poruka) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Informacija");
-        alert.setHeaderText(null);
-        alert.setContentText(poruka);
-        alert.showAndWait();
     }
 }

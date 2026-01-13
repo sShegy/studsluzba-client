@@ -13,21 +13,14 @@ import java.time.LocalDate;
 
 @Controller
 public class IspitController {
-    @FXML
-    private TableView<IspitniRokResponseDTO> tabelaRokova;
-    @FXML
-    private TableColumn<IspitniRokResponseDTO, String> colNaziv;
-    @FXML
-    private TableColumn<IspitniRokResponseDTO, LocalDate> colPocetak;
-    @FXML
-    private TableColumn<IspitniRokResponseDTO, LocalDate> colKraj;
+    @FXML private TableView<IspitniRokResponseDTO> tabelaRokova;
+    @FXML private TableColumn<IspitniRokResponseDTO, String> colNaziv;
+    @FXML private TableColumn<IspitniRokResponseDTO, LocalDate> colPocetak;
+    @FXML private TableColumn<IspitniRokResponseDTO, LocalDate> colKraj;
 
-    @FXML
-    private TextField txtNaziv;
-    @FXML
-    private DatePicker datumPocetka, datumKraja;
-    @FXML
-    private Button btnNazad;
+    @FXML private TextField txtNaziv;
+    @FXML private DatePicker datumPocetka, datumKraja;
+    @FXML private Button btnNazad;
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
@@ -43,7 +36,7 @@ public class IspitController {
         colPocetak.setCellValueFactory(new PropertyValueFactory<>("datumPocetka"));
         colKraj.setCellValueFactory(new PropertyValueFactory<>("datumZavrsetka"));
 
-        refreshTable();
+        osveziTabelu();
 
         tabelaRokova.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -56,7 +49,7 @@ public class IspitController {
         });
     }
 
-    private void refreshTable() {
+    private void osveziTabelu() {
         apiClient.getAllIspitniRokovi()
                 .collectList()
                 .subscribe(lista -> Platform.runLater(() -> tabelaRokova.getItems().setAll(lista)),
@@ -86,16 +79,13 @@ public class IspitController {
 
         apiClient.dodajIspitniRok(naziv, pocetak, kraj).subscribe(res -> {
             Platform.runLater(() -> {
-                refreshTable();
-                txtNaziv.clear();
-                datumPocetka.setValue(null);
-                datumKraja.setValue(null);
+                osveziTabelu();
+                txtNaziv.clear(); datumPocetka.setValue(null); datumKraja.setValue(null);
             });
         }, Throwable::printStackTrace);
     }
 
-    @FXML
-    private void handleBack() {
+    @FXML private void handleBack() {
         navigationManager.goBack();
     }
 

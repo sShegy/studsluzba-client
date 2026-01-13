@@ -1,12 +1,15 @@
 package org.raflab.studsluzba.client.controllers;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 import org.raflab.studsluzba.client.core.ClientCache;
 import org.raflab.studsluzba.client.core.NavigationManager;
 import org.raflab.studsluzba.dto.PredmetDTO;
+import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
 import org.raflab.studsluzba.dto.skolskagodina.response.SkolskaGodinaResponseDTO;
 import org.raflab.studsluzba.dto.student.request.CreateUplataRequestDTO;
 import org.raflab.studsluzba.dto.student.request.ObnovaGodineRequestDTO;
@@ -59,6 +62,13 @@ public class StudentProfileController {
     @FXML private TableColumn<UpisanaGodinaResponseDTO, String> colDatumUpisa;
     @FXML private TableColumn<UpisanaGodinaResponseDTO, String> colTip;
 
+    // --- TABELA PRIJAVA ISPITA (NOVO) ---
+    @FXML private TableView<IspitResponseDTO> tblPrijavaIspita;
+    @FXML private TableColumn<IspitResponseDTO, String> colPrijavaPredmet;
+    @FXML private TableColumn<IspitResponseDTO, String> colPrijavaDatum;
+    @FXML private TableColumn<IspitResponseDTO, String> colPrijavaVreme;
+    @FXML private TableColumn<IspitResponseDTO, Void> colPrijavaAkcija;
+
     // --- PROSEK I ESPB ---
     @FXML private Label lblProsek;
     @FXML private Label lblEspb;
@@ -98,6 +108,44 @@ public class StudentProfileController {
         colSkolskaGodina.setCellValueFactory(new PropertyValueFactory<>("skolskaGodina"));
         colDatumUpisa.setCellValueFactory(new PropertyValueFactory<>("datumUpisa"));
         colTip.setCellValueFactory(new PropertyValueFactory<>("tip"));
+
+        // --- KONFIGURACIJA TABELE ZA PRIJAVU ISPITA (NOVO) ---
+        if (colPrijavaPredmet != null) {
+            colPrijavaPredmet.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getPredmet().getNaziv()));
+
+            colPrijavaDatum.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getDatumOdrzavanja().toString()));
+
+            colPrijavaVreme.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getVremePocetka().toString()));
+
+            // --- DUGME "PRIJAVI" U TABELI ---
+            colPrijavaAkcija.setCellFactory(new Callback<>() {
+                @Override
+                public TableCell<IspitResponseDTO, Void> call(final TableColumn<IspitResponseDTO, Void> param) {
+                    return new TableCell<>() {
+                        private final Button btn = new Button("Prijavi");
+                        {
+                            btn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;");
+                            btn.setOnAction(event -> {
+                                IspitResponseDTO ispit = getTableView().getItems().get(getIndex());
+                                handlePrijavaIspita(ispit);
+                            });
+                        }
+                        @Override
+                        public void updateItem(Void item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setGraphic(null);
+                            } else {
+                                setGraphic(btn);
+                            }
+                        }
+                    };
+                }
+            });
+        }
 
         // --- LISTENER ZA TABOVE (NAVIGACIJA) ---
         if (mainTabPane != null) {
@@ -144,6 +192,9 @@ public class StudentProfileController {
                     loadNepolozeni(student.getIndeksId());
                     loadTokStudija(student.getIndeksId());
                     loadFinansije(student.getIndeksId());
+
+                    // --- UČITAJ DOSTUPNE ISPITE ZA PRIJAVU (NOVO) ---
+                    loadDostupniIspiti(this.currentStudentId);
                 } else {
                     showError("Upozorenje", "Student nema aktivan indeks ID!");
                 }
@@ -207,6 +258,41 @@ public class StudentProfileController {
                 lblStanje.setText(stanje.getPreostaloZaUplatu() + " RSD");
             });
         }, error -> showError("Greška", "Greška pri učitavanju finansija: " + error.getMessage()));
+    }
+
+
+    private void loadDostupniIspiti(Long studentId) {
+        apiClient.getDostupniIspitiZaStudenta(studentId).collectList().subscribe(ispiti -> {
+            Platform.runLater(() -> {
+                if (tblPrijavaIspita != null) {
+                    tblPrijavaIspita.getItems().setAll(ispiti);
+                }
+            });
+        }, error -> {
+            // Samo logujemo grešku, ne iskačemo korisniku ako nema ispita ili endpoint još ne postoji
+            System.out.println("Info: Nema dostupnih ispita ili greška: " + error.getMessage());
+        });
+    }
+
+    private void handlePrijavaIspita(IspitResponseDTO ispit) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Potvrda prijave");
+        confirm.setHeaderText("Prijavljujete ispit: " + ispit.getPredmet().getNaziv());
+        confirm.setContentText("Da li ste sigurni da želite da prijavite ovaj ispit?");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                apiClient.prijaviIspit(this.currentStudentId, ispit.getId()).subscribe(success -> {
+                    Platform.runLater(() -> {
+                        showSuccess("Uspešno ste prijavili ispit iz predmeta: " + ispit.getPredmet().getNaziv());
+                        // Osveži listu (ispit bi trebalo da nestane ili da se označi)
+                        loadDostupniIspiti(this.currentStudentId);
+                        // Osveži finansije jer prijava možda košta
+                        loadFinansije(this.currentIndeksId);
+                    });
+                }, error -> showError("Greška pri prijavi", "Neuspešna prijava: " + error.getMessage()));
+            }
+        });
     }
 
     @FXML
