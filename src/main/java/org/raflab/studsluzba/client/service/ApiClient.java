@@ -1,10 +1,13 @@
 package org.raflab.studsluzba.client.service;
 
+import org.raflab.studsluzba.dto.DrziPredmetDTO;
 import org.raflab.studsluzba.dto.PredmetDTO;
 import org.raflab.studsluzba.dto.RestPage; // <--- OVO JE BITNO
+import org.raflab.studsluzba.dto.ispit.request.CreateIspitRequestDTO;
 import org.raflab.studsluzba.dto.ispit.request.CreateIspitniRokRequestDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO;
+import org.raflab.studsluzba.dto.ispit.response.PrijavljeniStudentResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.request.CreatePredmetRequestDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO;
@@ -226,4 +229,27 @@ public class ApiClient {
                 .retrieve()
                 .bodyToMono(Long.class);
     }
+
+    public Mono<Long> zakaziIspit(CreateIspitRequestDTO request) {
+        return webClient.post()
+                .uri("/ispiti/zakazi")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
+
+    public Flux<PrijavljeniStudentResponseDTO> getPrijavljeniStudenti(Long ispitId) {
+        return webClient.get()
+                .uri("/ispiti/" + ispitId + "/prijavljeni")
+                .retrieve()
+                .bodyToFlux(PrijavljeniStudentResponseDTO.class);
+    }
+
+    public Flux<DrziPredmetDTO> getSveVezeNastavnikPredmet() {
+        return webClient.get()
+                .uri("/ispiti/drzi-predmet/sve")
+                .retrieve()
+                .bodyToFlux(DrziPredmetDTO.class);
+    }
+
 }

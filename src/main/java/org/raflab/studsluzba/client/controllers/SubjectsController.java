@@ -63,7 +63,6 @@ public class SubjectsController {
                 .subscribe(programi -> {
                     Platform.runLater(() -> {
                         programiList.getItems().setAll(programi);
-                        // Selektuj prvi program automatski ako postoji
                         if (!programi.isEmpty()) {
                             programiList.getSelectionModel().selectFirst();
                         }

@@ -93,9 +93,8 @@ public class StudentSearchController {
 
     @FXML
     public void onSearch() {
-        currentPage = 0; // Nova pretraga uvek kreće od prve strane
+        currentPage = 0;
         loadPage();
-        System.out.println("Kliknuto");
     }
 
     private void loadPage() {

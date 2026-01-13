@@ -62,6 +62,21 @@ public class IspitController {
         LocalDate pocetak = datumPocetka.getValue();
         LocalDate kraj = datumKraja.getValue();
 
+        if (naziv == null || naziv.trim().isEmpty() || pocetak == null || kraj == null) {
+            displayError("Popunite sva polja!");
+            return;
+        }
+
+        if (kraj.isBefore(pocetak)) {
+            displayError("Datum kraja ne može biti pre datuma početka!");
+            return;
+        }
+        long trajanje = java.time.temporal.ChronoUnit.DAYS.between(pocetak, kraj);
+        if (trajanje < 10 || trajanje > 30) {
+            displayError("Ispitni rok mora trajati minimum 10 dana, a najvise 30 dana!");
+            return;
+        }
+
         apiClient.dodajIspitniRok(naziv, pocetak, kraj).subscribe(res -> {
             Platform.runLater(() -> {
                 osveziTabelu();
@@ -72,5 +87,13 @@ public class IspitController {
 
     @FXML private void handleBack() {
         navigationManager.goBack();
+    }
+
+    private void displayError(String poruka) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Informacija");
+        alert.setHeaderText(null);
+        alert.setContentText(poruka);
+        alert.showAndWait();
     }
 }
