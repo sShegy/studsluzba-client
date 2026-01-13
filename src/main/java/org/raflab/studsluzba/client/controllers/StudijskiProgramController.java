@@ -26,7 +26,6 @@ public class StudijskiProgramController {
     @FXML private TableColumn<StudijskiProgramResponseDTO, String> colNazivZvanja;
     @FXML private TableColumn<StudijskiProgramResponseDTO, Integer> colTrajanjeSemestra;
 
-
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
     private final ClientCache clientCache;

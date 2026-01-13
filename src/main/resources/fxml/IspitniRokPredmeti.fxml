@@ -7,7 +7,7 @@
         <Button layoutX="14.0" layoutY="14.0" onAction="#handleBack" text="Nazad na Rokove" />
         <Label fx:id="lblNaslov" layoutX="250.0" layoutY="18.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Ispiti za rok: " />
 
-        <TableView fx:id="tabelaIspita" layoutX="50.0" layoutY="60.0" prefHeight="450.0" prefWidth="700.0">
+        <TableView fx:id="tabelaIspita" layoutX="50.0" layoutY="60.0" prefHeight="450.0" prefWidth="860.0">
             <columns>
                 <TableColumn fx:id="colSifraPredmeta" prefWidth="150.0" text="Šifra Predmeta" />
                 <TableColumn fx:id="colNazivPredmeta" prefWidth="350.0" text="Naziv Predmeta" />
@@ -15,5 +15,26 @@
                 <TableColumn fx:id="colVreme" prefWidth="125.0" text="Vreme" />
             </columns>
         </TableView>
+        <HBox layoutX="50.0" layoutY="520.0" spacing="15.0" alignment="BOTTOM_LEFT">
+            <children>
+                <VBox spacing="5.0">
+                    <Label text="Predmet" />
+                    <ComboBox fx:id="comboDrziPredmet" prefWidth="250.0" promptText="Izaberi predmet..." />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Datum:" />
+                    <DatePicker fx:id="dpDatum" prefWidth="150.0" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Vreme (HH:mm):" />
+                    <TextField fx:id="txtVreme" prefWidth="100.0" promptText="npr. 09:00" />
+                </VBox>
+
+                <Button onAction="#addNewIspit" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="DODAJ ISPIT" prefHeight="25.0" />
+                <Label fx:id="greskaLabel" layoutX="50.0" layoutY="600.0" text="" textFill="RED" />
+            </children>
+        </HBox>
     </children>
 </AnchorPane>

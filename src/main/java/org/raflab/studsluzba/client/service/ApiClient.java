@@ -1,11 +1,18 @@
 package org.raflab.studsluzba.client.service;
 
+import org.raflab.studsluzba.dto.DrziPredmetDTO;
 import org.raflab.studsluzba.dto.PredmetDTO;
 import org.raflab.studsluzba.dto.RestPage; // <--- OVO JE BITNO
+import org.raflab.studsluzba.dto.ispit.request.CreateIspitRequestDTO;
 import org.raflab.studsluzba.dto.ispit.request.CreateIspitniRokRequestDTO;
+import org.raflab.studsluzba.dto.ispit.request.EvidencijaIzlaskaRequestDTO;
+import org.raflab.studsluzba.dto.ispit.request.PrijavaIspitaRequestDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
+import org.raflab.studsluzba.dto.ispit.response.IspitRezultatResponseDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO;
+import org.raflab.studsluzba.dto.ispit.response.PrijavljeniStudentResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.request.CreatePredmetRequestDTO;
+import org.raflab.studsluzba.dto.kurikulum.response.PredispitnaObavezaResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.PredmetDetaljiResponseDTO;
 import org.raflab.studsluzba.dto.kurikulum.response.StudijskiProgramResponseDTO;
 import org.raflab.studsluzba.dto.sifarnik.response.SrednjaSkolaResponseDTO;
@@ -16,12 +23,20 @@ import org.raflab.studsluzba.dto.student.response.StanjeFinansijaResponseDTO;
 import org.raflab.studsluzba.dto.student.response.StudentProfileResponseDTO;
 import org.raflab.studsluzba.dto.student.response.UpisanaGodinaResponseDTO;
 import org.springframework.core.ParameterizedTypeReference; // <--- BITNO
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiClient {
@@ -225,5 +240,26 @@ public class ApiClient {
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Long.class);
+    }
+    public Mono<Long> zakaziIspit(CreateIspitRequestDTO request) {
+        return webClient.post()
+                .uri("/ispiti/zakazi")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
+
+    public Flux<PrijavljeniStudentResponseDTO> getPrijavljeniStudenti(Long ispitId) {
+        return webClient.get()
+                .uri("/ispiti/" + ispitId + "/prijavljeni")
+                .retrieve()
+                .bodyToFlux(PrijavljeniStudentResponseDTO.class);
+    }
+
+    public Flux<DrziPredmetDTO> getSveVezeNastavnikPredmet() {
+        return webClient.get()
+                .uri("/ispiti/drzi-predmet/sve")
+                .retrieve()
+                .bodyToFlux(DrziPredmetDTO.class);
     }
 }

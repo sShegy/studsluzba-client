@@ -15,25 +15,39 @@ import org.springframework.stereotype.Controller;
 @Controller
 @Component
 public class StudijskiProgramDetailsController {
+    @FXML
+    private Label lblNazivPrograma;
+    @FXML
+    private Label lblOznaka;
+    @FXML
+    private Label lblGodina;
+    @FXML
+    private Label lblZvanje;
+    @FXML
+    private Label lblTrajanje;
 
-    @FXML private Label lblNazivPrograma;
-    @FXML private Label lblOznaka;
-    @FXML private Label lblGodina;
-    @FXML private Label lblZvanje;
-    @FXML private Label lblTrajanje;
+    @FXML
+    private TableView<PredmetDTO> tabelaPredmeti;
+    @FXML
+    private TableColumn<PredmetDTO, String> colSifra;
+    @FXML
+    private TableColumn<PredmetDTO, String> colNazivPredmeta;
+    @FXML
+    private TableColumn<PredmetDTO, Integer> colEspb;
+    @FXML
+    private TableColumn<PredmetDTO, Integer> colSemestar;
 
-    @FXML private TableView<PredmetDTO> tabelaPredmeti;
-    @FXML private TableColumn<PredmetDTO, String> colSifra;
-    @FXML private TableColumn<PredmetDTO, String> colNazivPredmeta;
-    @FXML private TableColumn<PredmetDTO, Integer> colEspb;
-    @FXML private TableColumn<PredmetDTO, Integer> colSemestar;
+    @FXML
+    private TextField txtSifra;
+    @FXML
+    private TextField txtNaziv;
+    @FXML
+    private TextField txtEspb;
+    @FXML
+    private TextField txtSemestar;
 
-    @FXML private TextField txtSifra;
-    @FXML private TextField txtNaziv;
-    @FXML private TextField txtEspb;
-    @FXML private TextField txtSemestar;
-
-    @FXML private Button btnBack;
+    @FXML
+    private Button btnBack;
 
     private StudijskiProgramResponseDTO trenutniProgram;
     private final NavigationManager navigationManager;
@@ -49,9 +63,6 @@ public class StudijskiProgramDetailsController {
 
         colSifra.setCellValueFactory(new PropertyValueFactory<>("sifra"));
         colNazivPredmeta.setCellValueFactory(new PropertyValueFactory<>("naziv"));
-//        colNazivPredmeta.setCellValueFactory(cellData ->
-//                new SimpleStringProperty(cellData.getValue().getPredmet().getNaziv())
-//        );
         colEspb.setCellValueFactory(new PropertyValueFactory<>("espb"));
         colSemestar.setCellValueFactory(new PropertyValueFactory<>("semestar"));
 
@@ -77,53 +88,102 @@ public class StudijskiProgramDetailsController {
             tabelaPredmeti.setItems(FXCollections.observableArrayList(program.getPredmeti()));
         }
     }
+
     @FXML
     private void handleDodajPredmet() {
-        String sifra = txtSifra.getText();
-        String naziv = txtNaziv.getText();
-        Integer espb = Integer.valueOf(txtEspb.getText());
-        Integer semestar = Integer.valueOf(txtSemestar.getText());
         Long programId = trenutniProgram.getId();
 
-        apiClient.addPredmet(programId, sifra, naziv, espb, semestar).subscribe(noviId -> {
-            Platform.runLater(() -> {
-                PredmetDTO zaTabelu = new PredmetDTO(noviId, sifra, naziv, espb, semestar);
-                tabelaPredmeti.getItems().add(zaTabelu);
+        String sifra = txtSifra.getText().trim();
+        String naziv = txtNaziv.getText().trim();
+        String espbRaw = txtEspb.getText().trim();
+        String semestarRaw = txtSemestar.getText().trim();
 
-                osveziTabelu();
+        if (sifra.isEmpty() || naziv.isEmpty() || espbRaw.isEmpty() || semestarRaw.isEmpty()) {
+            displayError("Popunite pravilno polja!");
+            return;
+        }
 
-                txtSifra.clear();
-                txtNaziv.clear();
-                txtEspb.clear();
-                txtSemestar.clear();
-            });
-        }, Throwable::printStackTrace);
+        try {
+            Integer espb = Integer.valueOf(espbRaw);
+            Integer semestar = Integer.valueOf(semestarRaw);
+
+            if (!sifra.matches("^P[1-4]\\d{2}$")) {
+                displayError("Popunite pravilno polja!");
+                return;
+            }
+            if (semestar < 1 || semestar > 8) {
+                displayError("Popunite pravilno polja!");
+                return;
+            }
+            if (espb < 2 || espb > 8) {
+                displayError("Popunite pravilno polja!");
+                return;
+            }
+
+            apiClient.addPredmet(programId, sifra, naziv, espb, semestar).subscribe(noviId -> {
+                        Platform.runLater(() -> {
+                            refreshTable();
+
+                            txtSifra.clear();
+                            txtNaziv.clear();
+                            txtEspb.clear();
+                            txtSemestar.clear();
+
+                            System.out.println("Predmet uspešno dodat sa ID: " + noviId);
+                        });
+                    }, error -> {
+                        Platform.runLater(() -> {
+                            if (error instanceof org.springframework.web.reactive.function.client.WebClientResponseException.Conflict) {
+                                displayError("Šifra '" + sifra + "' već postoji!");
+                            } else {
+                                displayError("Popunite pravilno polja!");
+                            }
+                        });
+                    }
+            );
+        }catch (NumberFormatException e) {
+            displayError("Popunite pravilno polja!");
+        }
+    }
+
+    private void displayError(String poruka) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Greška pri unosu");
+        alert.setHeaderText(null);
+        alert.setContentText(poruka);
+        alert.showAndWait();
     }
 
     @FXML
-    private void handleBack() {
+    private void handleBack () {
         navigationManager.goBack();
     }
 
     @FXML
-    private void handleAvg() {
+    private void handleAvg () {
         PredmetDTO selected = tabelaPredmeti.getSelectionModel().getSelectedItem();
         if (selected != null) {
             handleAvg(selected);
         }
     }
 
-    private void handleAvg(PredmetDTO program) {
+    private void handleAvg (PredmetDTO program){
         PredmetAvgController.setPodatakZaPrikaz(program);
         navigationManager.navigateTo("/fxml/PredmetAvg.fxml");
     }
 
-    private void osveziTabelu() {
+    private void refreshTable() {
         if (trenutniProgram == null)
             return;
 
         apiClient.getPredmetiByStudijskiProgram(trenutniProgram.getId())
-                .map(details -> new PredmetDTO(details.getId(), details.getSifra(), details.getNaziv(), details.getEspb(), details.getSemestar()))
+                .map(details -> new PredmetDTO(
+                        details.getId(),
+                        details.getSifra(),
+                        details.getNaziv(),
+                        details.getEspb(),
+                        details.getSemestar()
+                ))
                 .collectList()
                 .subscribe(lista -> {
                     Platform.runLater(() -> {
