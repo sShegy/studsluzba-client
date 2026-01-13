@@ -2,9 +2,8 @@ package org.raflab.studsluzba.client.service;
 
 import org.raflab.studsluzba.dto.DrziPredmetDTO;
 import org.raflab.studsluzba.dto.PredmetDTO;
-import org.raflab.studsluzba.dto.RestPage; // <--- OVO JE BITNO
-import org.raflab.studsluzba.dto.ispit.request.CreateIspitRequestDTO;
 import org.raflab.studsluzba.dto.ispit.request.CreateIspitniRokRequestDTO;
+import org.raflab.studsluzba.dto.ispit.request.PrijavaIspitaRequestDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitniRokResponseDTO;
 import org.raflab.studsluzba.dto.ispit.response.PrijavljeniStudentResponseDTO;
@@ -18,7 +17,6 @@ import org.raflab.studsluzba.dto.student.response.PolozenIspitResponseDTO;
 import org.raflab.studsluzba.dto.student.response.StanjeFinansijaResponseDTO;
 import org.raflab.studsluzba.dto.student.response.StudentProfileResponseDTO;
 import org.raflab.studsluzba.dto.student.response.UpisanaGodinaResponseDTO;
-import org.springframework.core.ParameterizedTypeReference; // <--- BITNO
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -252,4 +250,20 @@ public class ApiClient {
                 .bodyToFlux(DrziPredmetDTO.class);
     }
 
+
+    public Flux<IspitResponseDTO> getDostupniIspitiZaStudenta(Long studentId) {
+        return this.webClient.get()
+                .uri("/studenti/" + studentId + "/dostupni-ispiti")
+                .retrieve()
+                .bodyToFlux(IspitResponseDTO.class);
+    }
+
+    public Mono<Long> prijaviIspit(Long studentId, Long ispitId) {
+        PrijavaIspitaRequestDTO request = new PrijavaIspitaRequestDTO(studentId, ispitId);
+        return this.webClient.post()
+                .uri("/ispiti/prijava")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
 }
