@@ -267,4 +267,20 @@ public class ApiClient {
                 .retrieve()
                 .bodyToMono(Long.class);
     }
+
+    public Flux<StudentProfileResponseDTO> getStudentiZaPrijavu(Long ispitId) {
+        return webClient.get()
+                .uri("/ispiti/" + ispitId + "/dostupni-studenti")
+                .retrieve()
+                .bodyToFlux(StudentProfileResponseDTO.class);
+    }
+
+    public Mono<Long> prijaviStudenta(Long ispitId, Long studentIndeksId) {
+        PrijavaIspitaRequestDTO request = new PrijavaIspitaRequestDTO(studentIndeksId, ispitId);
+        return webClient.post()
+                .uri("/ispiti/prijavi-studenta")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
 }

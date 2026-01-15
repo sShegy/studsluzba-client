@@ -27,7 +27,7 @@ public class IspitniRokPredmetiController {
     @FXML private TableColumn<IspitResponseDTO, String> colNazivPredmeta;
     @FXML private TableColumn<IspitResponseDTO, String> colDatum;
     @FXML private TableColumn<IspitResponseDTO, String> colVreme;
-    @FXML private TableView<PrijavljeniStudentResponseDTO> tabelaPrijavljenih;
+    //@FXML private TableView<PrijavljeniStudentResponseDTO> tabelaPrijavljenih;
     @FXML private DatePicker dpDatum;
     @FXML private TextField txtVreme;
     @FXML private Label greskaLabel;
@@ -65,14 +65,6 @@ public class IspitniRokPredmetiController {
 
             refreshTable();
 
-//            apiClient.getSveVezeNastavnikPredmet()
-//                    .collectList()
-//                    .subscribe(lista -> Platform.runLater(() -> {
-//                        comboDrziPredmet.getItems().setAll(lista);
-//                    }), error -> {
-//                        Platform.runLater(() -> greskaLabel.setText("Greška pri učitavanju predmeta!"));
-//                    });
-
             apiClient.getSveVezeNastavnikPredmet()
                     .collectList()
                     .subscribe(lista -> Platform.runLater(() -> {
@@ -80,15 +72,15 @@ public class IspitniRokPredmetiController {
                     }), error -> {
                         Platform.runLater(() -> {
                             displayError("Greška pri učitavanju: " + error.getMessage());
-                            error.printStackTrace(); // Ovo će ti u konzoli ispisati pravi razlog greške
+                            error.printStackTrace();
                         });
                     });
 
-            tabelaIspita.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-                if (newSelection != null) {
-                    loadPrijavljeni(newSelection.getId());
-                }
-            });
+//            tabelaIspita.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+//                if (newSelection != null) {
+//                    loadPrijavljeni(newSelection.getId());
+//                }
+//            });
 
             comboDrziPredmet.setConverter(new StringConverter<DrziPredmetDTO>() {
                 @Override
@@ -112,13 +104,13 @@ public class IspitniRokPredmetiController {
         navigationManager.goBack();
     }
 
-    private void loadPrijavljeni(Long ispitId) {
-        apiClient.getPrijavljeniStudenti(ispitId)
-                .collectList()
-                .subscribe(lista -> Platform.runLater(() -> {
-                    tabelaPrijavljenih.getItems().setAll(lista);
-                }));
-    }
+//    private void loadPrijavljeni(Long ispitId) {
+//        apiClient.getPrijavljeniStudenti(ispitId)
+//                .collectList()
+//                .subscribe(lista -> Platform.runLater(() -> {
+//                    tabelaPrijavljenih.getItems().setAll(lista);
+//                }));
+//    }
 
     private void displayError(String poruka) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -168,5 +160,32 @@ public class IspitniRokPredmetiController {
                 dpDatum.setValue(null);
             });
         });
+    }
+
+    @FXML
+    private void handleShowPrijavljeni() {
+        IspitResponseDTO selektovani = tabelaIspita.getSelectionModel().getSelectedItem();
+
+        if (selektovani == null) {
+            displayError("Molimo odaberite ispit iz tabele!");
+            return;
+        }
+
+        PrijavljeniStudentiController.setOdabraniIspit(selektovani);
+
+        navigationManager.navigateTo("/fxml/PrijavljeniStudenti.fxml");
+    }
+
+    @FXML
+    private void handlePrijava(){
+        IspitResponseDTO selektovani = tabelaIspita.getSelectionModel().getSelectedItem();
+
+        if (selektovani == null) {
+            displayError("Molimo odaberite ispit iz tabele!");
+            return;
+        }
+        PrijavljeniStudentiController.setOdabraniIspit(selektovani);
+
+        navigationManager.navigateTo("/fxml/Prijava.fxml");
     }
 }
