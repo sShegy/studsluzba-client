@@ -2,6 +2,7 @@ package org.raflab.studsluzba.client.service;
 
 import org.raflab.studsluzba.dto.DrziPredmetDTO;
 import org.raflab.studsluzba.dto.PredmetDTO;
+import org.raflab.studsluzba.dto.ispit.request.CreateIspitRequestDTO;
 import org.raflab.studsluzba.dto.ispit.request.CreateIspitniRokRequestDTO;
 import org.raflab.studsluzba.dto.ispit.request.PrijavaIspitaRequestDTO;
 import org.raflab.studsluzba.dto.ispit.response.IspitResponseDTO;
@@ -163,8 +164,8 @@ public class ApiClient {
                 .bodyToMono(Double.class);
     }
 
-    public Mono<Long> addPredmet(Long programId, String sifra, String naziv, Integer espb, Integer semestar) {
-        CreatePredmetRequestDTO request = new CreatePredmetRequestDTO(programId, sifra, naziv, espb, semestar);
+    public Mono<Long> addPredmet(Long programId, String sifra, String naziv, Integer espb, Integer semestar, Integer fondP, Integer fondV, String opis, Boolean obavezan) {
+        CreatePredmetRequestDTO request = new CreatePredmetRequestDTO(programId, sifra, naziv, espb, semestar, fondP, fondV, opis, obavezan);
         return this.webClient.post()
                 .uri("/kurikulum/predmeti")
                 .bodyValue(request)
@@ -243,12 +244,21 @@ public class ApiClient {
                 .bodyToFlux(PrijavljeniStudentResponseDTO.class);
     }
 
-    public Flux<DrziPredmetDTO> getSveVezeNastavnikPredmet() {
+//    public Flux<DrziPredmetDTO> getSveVezeNastavnikPredmet() {
+//        return webClient.get()
+//                .uri("/ispiti/drzi-predmet/sve")
+//                .retrieve()
+//                .bodyToFlux(DrziPredmetDTO.class);
+//    }
+    public Flux<DrziPredmetDTO> getSveVezeNastavnikPredmet(Long rokId) {
         return webClient.get()
-                .uri("/ispiti/drzi-predmet/sve")
-                .retrieve()
-                .bodyToFlux(DrziPredmetDTO.class);
-    }
+            .uri(uriBuilder -> uriBuilder
+                    .path("/ispiti/drzi-predmet/sve")
+                    .queryParam("rokId", rokId)
+                    .build())
+            .retrieve()
+            .bodyToFlux(DrziPredmetDTO.class);
+}
 
 
     public Flux<IspitResponseDTO> getDostupniIspitiZaStudenta(Long studentId) {
@@ -262,6 +272,22 @@ public class ApiClient {
         PrijavaIspitaRequestDTO request = new PrijavaIspitaRequestDTO(studentId, ispitId);
         return this.webClient.post()
                 .uri("/ispiti/prijava")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Long.class);
+    }
+
+    public Flux<StudentProfileResponseDTO> getStudentiZaPrijavu(Long ispitId) {
+        return webClient.get()
+                .uri("/ispiti/" + ispitId + "/dostupni-studenti")
+                .retrieve()
+                .bodyToFlux(StudentProfileResponseDTO.class);
+    }
+
+    public Mono<Long> prijaviStudenta(Long ispitId, Long studentIndeksId) {
+        PrijavaIspitaRequestDTO request = new PrijavaIspitaRequestDTO(studentIndeksId, ispitId);
+        return webClient.post()
+                .uri("/ispiti/prijavi-studenta")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Long.class);

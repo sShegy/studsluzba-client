@@ -1,5 +1,7 @@
 package org.raflab.studsluzba.client.core;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,6 +30,9 @@ public class NavigationManager {
     private NavigationState currentState;
     private boolean isNavigating = false;
 
+    private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
+    private final BooleanProperty canGoForward = new SimpleBooleanProperty(false);
+
     @Value("${app.history.max-depth:50}")
     private int maxHistoryDepth;
 
@@ -40,11 +45,19 @@ public class NavigationManager {
         setupGlobalEventHandlers(scene);
     }
 
+    public BooleanProperty canGoBackProperty() {
+        return canGoBack;
+    }
+
+    public BooleanProperty canGoForwardProperty() {
+        return canGoForward;
+    }
+
     public boolean isNavigating() {
         return isNavigating;
     }
 
-
+    // Ažurira stanje trenutnog kontrolera (npr. čuva tekst iz search polja pre nego što odemo dalje)
     public void updateCurrentStateSetup(Consumer<Object> newSetup) {
         if (currentState != null) {
             currentState.controllerSetup = newSetup;
@@ -63,10 +76,11 @@ public class NavigationManager {
             }
         }
         forwardStack.clear();
+
         loadView(fxmlPath, controllerSetup);
+        updateProperties();
     }
 
-    // Koristi se za internu navigaciju (npr. promena tabova) bez ponovnog učitavanja FXML-a
     public void recordStateChange(Consumer<Object> newStateSetup) {
         if (isNavigating) return;
 
@@ -76,8 +90,8 @@ public class NavigationManager {
         }
         forwardStack.clear();
 
-        // Ažuriramo trenutno stanje sa novim setup-om, ali istom putanjom
         currentState = new NavigationState(currentState.fxmlPath, newStateSetup);
+        updateProperties();
     }
 
     public void goBack() {
@@ -86,8 +100,12 @@ public class NavigationManager {
         isNavigating = true;
         try {
             forwardStack.push(currentState);
+
+            // Uzimamo prethodno stanje
             NavigationState previous = backStack.pop();
             loadView(previous.fxmlPath, previous.controllerSetup);
+
+            updateProperties();
         } finally {
             isNavigating = false;
         }
@@ -99,11 +117,19 @@ public class NavigationManager {
         isNavigating = true;
         try {
             backStack.push(currentState);
+
             NavigationState next = forwardStack.pop();
             loadView(next.fxmlPath, next.controllerSetup);
+
+            updateProperties();
         } finally {
             isNavigating = false;
         }
+    }
+
+    private void updateProperties() {
+        canGoBack.set(!backStack.isEmpty());
+        canGoForward.set(!forwardStack.isEmpty());
     }
 
     private void loadView(String fxmlPath, Consumer<Object> controllerSetup) {
@@ -111,7 +137,7 @@ public class NavigationManager {
             FXMLLoader loader = springFXMLLoader.load(fxmlPath);
             Parent view = loader.load();
 
-            // Ako postoji setup logika (npr. popunjavanje podataka), izvrši je
+            // Ako postoji logika za popunjavanje podataka (npr. selekcija studenta), izvrši je
             if (controllerSetup != null) {
                 controllerSetup.accept(loader.getController());
             }
@@ -126,7 +152,7 @@ public class NavigationManager {
     }
 
     private void setupGlobalEventHandlers(Scene scene) {
-        // Miš (Back/Forward dugmići - Button 4 i 5)
+        // Podrška za dugmiće na mišu (Back/Forward)
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (event.getButton() == MouseButton.BACK) {
                 goBack();
@@ -138,11 +164,11 @@ public class NavigationManager {
         });
 
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.isControlDown()) {
-                if (event.getCode() == KeyCode.OPEN_BRACKET) {
+            if (event.isControlDown() || event.isMetaDown()) {
+                if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.OPEN_BRACKET) {
                     goBack();
                     event.consume();
-                } else if (event.getCode() == KeyCode.CLOSE_BRACKET) {
+                } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.CLOSE_BRACKET) {
                     goForward();
                     event.consume();
                 }

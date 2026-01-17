@@ -28,7 +28,6 @@ public class StudentSearchController {
     @FXML private TableColumn<StudentProfileResponseDTO, String> colProgram;
     @FXML private TableColumn<StudentProfileResponseDTO, String> colEmail;
 
-
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
     private final ClientCache clientCache;
@@ -47,6 +46,27 @@ public class StudentSearchController {
         colProgram.setCellValueFactory(new PropertyValueFactory<>("studijskiProgram"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
+        // Validacija unosa
+        indeksInput.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("[0-9/]*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        imeInput.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("[a-zA-ZšđčćžŠĐČĆŽ\\s\\-]*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        prezimeInput.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("[a-zA-ZšđčćžŠĐČĆŽ\\s\\-]*")) {
+                return change;
+            }
+            return null;
+        }));
 
         studentsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -56,9 +76,30 @@ public class StudentSearchController {
         });
 
         skolaCombo.setConverter(new StringConverter<>() {
-            @Override public String toString(SrednjaSkolaResponseDTO skola) { return skola != null ? skola.getNaziv() : ""; }
-            @Override public SrednjaSkolaResponseDTO fromString(String string) { return null; }
+            @Override
+            public String toString(SrednjaSkolaResponseDTO skola) {
+                return skola != null ? skola.getNaziv() : null;
+            }
+
+            @Override
+            public SrednjaSkolaResponseDTO fromString(String string) {
+                return null;
+            }
         });
+
+
+        skolaCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(SrednjaSkolaResponseDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("Izaberi srednju školu"); // <-- FORSIRAMO TEKST
+                } else {
+                    setText(item.getNaziv());
+                }
+            }
+        });
+
         skolaCombo.setVisibleRowCount(15);
 
         loadSkole();
@@ -95,13 +136,11 @@ public class StudentSearchController {
         searchFlux.collectList().subscribe(studenti -> {
             Platform.runLater(() -> {
                 var filtriranaLista = studenti;
-
-                if (!trazeniIndeks.isEmpty()) {
+                if (!trazeniIndeks.isEmpty() && izabranaSkola != null) {
                     filtriranaLista = studenti.stream()
                             .filter(s -> s.getAktivniIndeks() != null && s.getAktivniIndeks().contains(trazeniIndeks))
                             .toList();
                 }
-
                 studentsTable.getItems().setAll(filtriranaLista);
             });
         }, error -> Platform.runLater(() -> {
@@ -117,7 +156,11 @@ public class StudentSearchController {
         indeksInput.clear();
         imeInput.clear();
         prezimeInput.clear();
+
+        // Resetovanje ComboBox-a
+        skolaCombo.setValue(null);
         skolaCombo.getSelectionModel().clearSelection();
+
         onSearch();
     }
 

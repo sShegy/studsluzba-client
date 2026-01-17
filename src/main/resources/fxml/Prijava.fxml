@@ -1,0 +1,22 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Button?>
+<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.PrijavaController">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    <Label text="Studenti koji mogu da prijave ispit" style="-fx-font-weight: bold; -fx-font-size: 18;"/>
+    <TableView fx:id="tabelaStudenata" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIndeks" text="Broj Indeksa" prefWidth="120"/>
+            <TableColumn fx:id="colIme" text="Ime" prefWidth="180"/>
+            <TableColumn fx:id="colPrezime" text="Prezime" prefWidth="180"/>
+        </columns>
+    </TableView>
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Prijavi studenta" onAction="#handlePrijavi" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+        <Button fx:id="btnNazad" onAction="#handleBack" style="-fx-background-color: red;" text="Nazad" textFill="WHITE"/>
+    </HBox>
+</VBox>

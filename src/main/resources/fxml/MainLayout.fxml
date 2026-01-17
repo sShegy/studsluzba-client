@@ -4,21 +4,40 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="mainContainer" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.raflab.studsluzba.client.controllers.MainController">
 
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 1 0;">
+            <items>
+                <Button fx:id="btnBack" mnemonicParsing="false" onAction="#handleBack" text="⬅" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand;"/>
+                <Button fx:id="btnForward" mnemonicParsing="false" onAction="#handleForward" text="➡" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand;"/>
+                <Separator orientation="VERTICAL" />
+                <Label text="StudSlužba Klijent" textFill="#7f8c8d">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+            </items>
+        </ToolBar>
+    </top>
+
     <left>
         <VBox prefHeight="768.0" prefWidth="220.0" spacing="10.0" style="-fx-background-color: #2c3e50;" BorderPane.alignment="CENTER">
             <children>
-                <Label text="Studentska Služba" textFill="WHITE">
+                <Label text="Meni" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                     <VBox.margin>
-                        <Insets bottom="20.0" left="10.0" top="20.0" />
+                        <Insets bottom="10.0" left="20.0" top="20.0" />
                     </VBox.margin>
                 </Label>
                 <Separator prefWidth="200.0" />
@@ -43,7 +62,7 @@
                     <font><Font size="14.0" /></font>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#onPregledClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="📝  Pregled">
+                <Button mnemonicParsing="false" onAction="#onPregledClick" prefHeight="40.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-text-fill: white; -fx-cursor: hand;" text="📊  Pregled">
                     <padding><Insets left="20.0" /></padding>
                     <font><Font size="14.0" /></font>
                 </Button>

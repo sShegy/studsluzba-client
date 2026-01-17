@@ -35,6 +35,8 @@
 
                 <Button onAction="#addNewIspit" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="DODAJ ISPIT" prefHeight="25.0" />
                 <Label fx:id="greskaLabel" layoutX="50.0" layoutY="600.0" text="" textFill="RED" />
+                <Button text="Pokaži prijavljene" onAction="#handleShowPrijavljeni" style="-fx-background-color: #0b2975; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Prijava" onAction="#handlePrijava" style="-fx-background-color: #75400b; -fx-text-fill: white; -fx-font-weight: bold;"/>
             </children>
         </HBox>
     </children>

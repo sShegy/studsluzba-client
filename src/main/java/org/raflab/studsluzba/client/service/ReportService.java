@@ -3,10 +3,12 @@ package org.raflab.studsluzba.client.service;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
+import org.raflab.studsluzba.dto.PredmetDTO;
 import org.raflab.studsluzba.dto.student.response.PolozenIspitResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,5 +65,19 @@ public class ReportService {
             e.printStackTrace();
             throw new RuntimeException("Greška pri generisanju izveštaja: " + e.getMessage());
         }
+    }
+
+    public void generateIzvestajProseka(String rasponGodina, List<PredmetDTO> podaci) throws Exception {
+        InputStream reportStream = getClass().getResourceAsStream("/reports/ProsekPredmeta.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("raspon", rasponGodina);
+        parameters.put("datum", LocalDate.now().toString());
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(podaci);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        JasperViewer.viewReport(jasperPrint, false);
     }
 }

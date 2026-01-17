@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Controller
 public class IspitniRokPredmetiController {
@@ -27,10 +28,8 @@ public class IspitniRokPredmetiController {
     @FXML private TableColumn<IspitResponseDTO, String> colNazivPredmeta;
     @FXML private TableColumn<IspitResponseDTO, String> colDatum;
     @FXML private TableColumn<IspitResponseDTO, String> colVreme;
-    @FXML private TableView<PrijavljeniStudentResponseDTO> tabelaPrijavljenih;
     @FXML private DatePicker dpDatum;
     @FXML private TextField txtVreme;
-    @FXML private Label greskaLabel;
     @FXML private ComboBox<DrziPredmetDTO> comboDrziPredmet;
 
     private final ApiClient apiClient;
@@ -65,30 +64,21 @@ public class IspitniRokPredmetiController {
 
             refreshTable();
 
-//            apiClient.getSveVezeNastavnikPredmet()
-//                    .collectList()
-//                    .subscribe(lista -> Platform.runLater(() -> {
-//                        comboDrziPredmet.getItems().setAll(lista);
-//                    }), error -> {
-//                        Platform.runLater(() -> greskaLabel.setText("Greška pri učitavanju predmeta!"));
-//                    });
-
-            apiClient.getSveVezeNastavnikPredmet()
+            apiClient.getSveVezeNastavnikPredmet(trenutniRok.getId())
                     .collectList()
                     .subscribe(lista -> Platform.runLater(() -> {
                         comboDrziPredmet.getItems().setAll(lista);
+
+                        if (lista.isEmpty()) {
+                            comboDrziPredmet.setPromptText("Svi predmeti su već zakazani");
+                        }
+
                     }), error -> {
                         Platform.runLater(() -> {
                             displayError("Greška pri učitavanju: " + error.getMessage());
-                            error.printStackTrace(); // Ovo će ti u konzoli ispisati pravi razlog greške
+                            error.printStackTrace();
                         });
                     });
-
-            tabelaIspita.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-                if (newSelection != null) {
-                    loadPrijavljeni(newSelection.getId());
-                }
-            });
 
             comboDrziPredmet.setConverter(new StringConverter<DrziPredmetDTO>() {
                 @Override
@@ -112,13 +102,13 @@ public class IspitniRokPredmetiController {
         navigationManager.goBack();
     }
 
-    private void loadPrijavljeni(Long ispitId) {
-        apiClient.getPrijavljeniStudenti(ispitId)
-                .collectList()
-                .subscribe(lista -> Platform.runLater(() -> {
-                    tabelaPrijavljenih.getItems().setAll(lista);
-                }));
-    }
+//    private void loadPrijavljeni(Long ispitId) {
+//        apiClient.getPrijavljeniStudenti(ispitId)
+//                .collectList()
+//                .subscribe(lista -> Platform.runLater(() -> {
+//                    tabelaPrijavljenih.getItems().setAll(lista);
+//                }));
+//    }
 
     private void displayError(String poruka) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -126,6 +116,17 @@ public class IspitniRokPredmetiController {
         alert.setHeaderText(null);
         alert.setContentText(poruka);
         alert.showAndWait();
+    }
+
+    private void refreshComboBox() {
+        apiClient.getSveVezeNastavnikPredmet(trenutniRok.getId())
+                .collectList()
+                .subscribe(lista -> {
+                    Platform.runLater(() -> {
+                        comboDrziPredmet.getItems().setAll(lista);
+                        comboDrziPredmet.getSelectionModel().clearSelection();
+                    });
+                });
     }
 
     @FXML private void addNewIspit() {
@@ -163,10 +164,38 @@ public class IspitniRokPredmetiController {
         apiClient.zakaziIspit(request).subscribe(res -> {
             Platform.runLater(() -> {
                 refreshTable();
+                refreshComboBox();
                 displayError("Ispit uspešno zakazan!");
                 txtVreme.clear();
                 dpDatum.setValue(null);
             });
         });
+    }
+
+    @FXML
+    private void handleShowPrijavljeni() {
+        IspitResponseDTO selektovani = tabelaIspita.getSelectionModel().getSelectedItem();
+
+        if (selektovani == null) {
+            displayError("Molimo odaberite ispit iz tabele!");
+            return;
+        }
+
+        PrijavljeniStudentiController.setOdabraniIspit(selektovani);
+
+        navigationManager.navigateTo("/fxml/PrijavljeniStudenti.fxml");
+    }
+
+    @FXML
+    private void handlePrijava(){
+        IspitResponseDTO selektovani = tabelaIspita.getSelectionModel().getSelectedItem();
+
+        if (selektovani == null) {
+            displayError("Molimo odaberite ispit iz tabele!");
+            return;
+        }
+        PrijavaController.setOdabraniIspit(selektovani);
+
+        navigationManager.navigateTo("/fxml/Prijava.fxml");
     }
 }
