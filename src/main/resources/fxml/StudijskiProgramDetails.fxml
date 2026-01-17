@@ -70,10 +70,15 @@
 
     <HBox spacing="10.0" alignment="CENTER_LEFT">
         <TextField fx:id="txtSifra" promptText="Šifra" prefWidth="80.0" />
-        <TextField fx:id="txtNaziv" promptText="Naziv novog predmeta" HBox.hgrow="ALWAYS" />
+        <TextField fx:id="txtNaziv" promptText="Naziv novog predmeta" prefWidth="450.0" />
         <TextField fx:id="txtEspb" promptText="ESPB" prefWidth="60.0" />
         <TextField fx:id="txtSemestar" promptText="semestar" prefWidth="90.0" />
-        <Button onAction="#handleDodajPredmet" text="Dodaj predmet"
-                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;" />
+    </HBox>
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <TextField fx:id="txtFondPredavanja" promptText="Fond P (0-4)" prefWidth="100.0" />
+        <TextField fx:id="txtFondVezbe" promptText="Fond V (0-4)" prefWidth="100.0" />
+        <TextArea fx:id="txtOpis" promptText="Opis predmeta..." prefWidth="350.0" prefHeight="20.0" />
+        <CheckBox fx:id="chkObavezan" text="Obavezan" />
+        <Region HBox.hgrow="ALWAYS" /> <Button onAction="#handleDodajPredmet" text="Dodaj predmet" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
     </HBox>
 </VBox>

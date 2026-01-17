@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Controller
 public class IspitniRokPredmetiController {
@@ -27,10 +28,8 @@ public class IspitniRokPredmetiController {
     @FXML private TableColumn<IspitResponseDTO, String> colNazivPredmeta;
     @FXML private TableColumn<IspitResponseDTO, String> colDatum;
     @FXML private TableColumn<IspitResponseDTO, String> colVreme;
-    //@FXML private TableView<PrijavljeniStudentResponseDTO> tabelaPrijavljenih;
     @FXML private DatePicker dpDatum;
     @FXML private TextField txtVreme;
-    @FXML private Label greskaLabel;
     @FXML private ComboBox<DrziPredmetDTO> comboDrziPredmet;
 
     private final ApiClient apiClient;
@@ -65,22 +64,21 @@ public class IspitniRokPredmetiController {
 
             refreshTable();
 
-            apiClient.getSveVezeNastavnikPredmet()
+            apiClient.getSveVezeNastavnikPredmet(trenutniRok.getId())
                     .collectList()
                     .subscribe(lista -> Platform.runLater(() -> {
                         comboDrziPredmet.getItems().setAll(lista);
+
+                        if (lista.isEmpty()) {
+                            comboDrziPredmet.setPromptText("Svi predmeti su već zakazani");
+                        }
+
                     }), error -> {
                         Platform.runLater(() -> {
                             displayError("Greška pri učitavanju: " + error.getMessage());
                             error.printStackTrace();
                         });
                     });
-
-//            tabelaIspita.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-//                if (newSelection != null) {
-//                    loadPrijavljeni(newSelection.getId());
-//                }
-//            });
 
             comboDrziPredmet.setConverter(new StringConverter<DrziPredmetDTO>() {
                 @Override
@@ -120,6 +118,17 @@ public class IspitniRokPredmetiController {
         alert.showAndWait();
     }
 
+    private void refreshComboBox() {
+        apiClient.getSveVezeNastavnikPredmet(trenutniRok.getId())
+                .collectList()
+                .subscribe(lista -> {
+                    Platform.runLater(() -> {
+                        comboDrziPredmet.getItems().setAll(lista);
+                        comboDrziPredmet.getSelectionModel().clearSelection();
+                    });
+                });
+    }
+
     @FXML private void addNewIspit() {
         DrziPredmetDTO selektovan = comboDrziPredmet.getValue();
         LocalDate izabraniDatum = dpDatum.getValue();
@@ -155,6 +164,7 @@ public class IspitniRokPredmetiController {
         apiClient.zakaziIspit(request).subscribe(res -> {
             Platform.runLater(() -> {
                 refreshTable();
+                refreshComboBox();
                 displayError("Ispit uspešno zakazan!");
                 txtVreme.clear();
                 dpDatum.setValue(null);
@@ -184,7 +194,7 @@ public class IspitniRokPredmetiController {
             displayError("Molimo odaberite ispit iz tabele!");
             return;
         }
-        PrijavljeniStudentiController.setOdabraniIspit(selektovani);
+        PrijavaController.setOdabraniIspit(selektovani);
 
         navigationManager.navigateTo("/fxml/Prijava.fxml");
     }

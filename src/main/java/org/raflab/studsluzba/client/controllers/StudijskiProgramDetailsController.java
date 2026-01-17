@@ -47,6 +47,11 @@ public class StudijskiProgramDetailsController {
     @FXML
     private TextField txtSemestar;
 
+    @FXML private TextField txtFondPredavanja;
+    @FXML private TextField txtFondVezbe;
+    @FXML private TextArea txtOpis;
+    @FXML private CheckBox chkObavezan;
+
     @FXML
     private Button btnBack;
 
@@ -99,6 +104,11 @@ public class StudijskiProgramDetailsController {
         String espbRaw = txtEspb.getText().trim();
         String semestarRaw = txtSemestar.getText().trim();
 
+        String fondPRaw = txtFondPredavanja.getText().trim();
+        String fondVRaw = txtFondVezbe.getText().trim();
+        String opis = txtOpis.getText().trim();
+        Boolean obavezan = chkObavezan.isSelected();
+
         if (sifra.isEmpty() || naziv.isEmpty() || espbRaw.isEmpty() || semestarRaw.isEmpty()) {
             displayError("Popunite pravilno polja!");
             return;
@@ -107,6 +117,8 @@ public class StudijskiProgramDetailsController {
         try {
             Integer espb = Integer.valueOf(espbRaw);
             Integer semestar = Integer.valueOf(semestarRaw);
+            Integer fondP = Integer.valueOf(fondPRaw);
+            Integer fondV = Integer.valueOf(fondVRaw);
 
             if (!sifra.matches("^P[1-4]\\d{2}$")) {
                 displayError("Popunite pravilno polja, sifra mora biti slovo P i tri broja, prvi je od 1 do 4!");
@@ -120,8 +132,12 @@ public class StudijskiProgramDetailsController {
                 displayError("Popunite pravilno polja!");
                 return;
             }
+            if (fondP < 0 || fondP > 4 || fondV < 0 || fondV > 4) {
+                displayError("Fond časova mora biti između 0 i 4!");
+                return;
+            }
 
-            apiClient.addPredmet(programId, sifra, naziv, espb, semestar).subscribe(noviId -> {
+            apiClient.addPredmet(programId, sifra, naziv, espb, semestar, fondP, fondV, opis, obavezan).subscribe(noviId -> {
                 Platform.runLater(() -> {
                     refreshTable();
 
@@ -129,6 +145,10 @@ public class StudijskiProgramDetailsController {
                     txtNaziv.clear();
                     txtEspb.clear();
                     txtSemestar.clear();
+                    txtFondPredavanja.clear();
+                    txtFondVezbe.clear();
+                    txtOpis.clear();
+                    chkObavezan.setSelected(false);
 
                     System.out.println("Predmet uspešno dodat sa ID: " + noviId);
                 });

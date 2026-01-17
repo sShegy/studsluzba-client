@@ -2,16 +2,19 @@ package org.raflab.studsluzba.client.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.raflab.studsluzba.client.core.NavigationManager;
 import org.raflab.studsluzba.client.service.ApiClient;
+import org.raflab.studsluzba.client.service.ReportService;
 import org.raflab.studsluzba.dto.PredmetDTO;
 import org.springframework.stereotype.Controller;
 
 import java.awt.print.PrinterJob;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,6 +27,7 @@ public class PredmetAvgController {
 
     private final ApiClient apiClient;
     private final NavigationManager navigationManager;
+    private final ReportService reportService;
     private List<PredmetDTO> sviPredmeti;
 
     private static PredmetDTO podatakZaPrikaz;
@@ -32,9 +36,10 @@ public class PredmetAvgController {
         podatakZaPrikaz = podatak;
     }
 
-    public PredmetAvgController(ApiClient apiClient, NavigationManager navigationManager) {
+    public PredmetAvgController(ApiClient apiClient, NavigationManager navigationManager, ReportService reportService) {
         this.apiClient = apiClient;
         this.navigationManager = navigationManager;
+        this.reportService = reportService;
     }
 
     @FXML
@@ -82,15 +87,30 @@ public class PredmetAvgController {
         }
     }
 
+    private void displayError(String poruka) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Greška pri unosu");
+        alert.setHeaderText(null);
+        alert.setContentText(poruka);
+        alert.showAndWait();
+    }
+
     @FXML
     private void handlePrint() {
-        System.out.println("Print");
-//        PrinterJob job = PrinterJob.createPrinterJob();
-//        if (job != null && job.showPrintDialog(tabelaProsek.getScene().getWindow())) {
-//            boolean success = job.printPage(tabelaProsek);
-//            if (success) { job.endJob(); }
-//        }
-        // komentar proba
+        try {
+            var listaPodataka = new ArrayList<>(tabelaProsek.getItems());
+
+            if (listaPodataka.isEmpty()) {
+                displayError("Nema podataka za štampu u tabeli.");
+                return;
+            }
+
+            String raspon = txtGodinaOd.getText() + " - " + txtGodinaDo.getText();
+            reportService.generateIzvestajProseka(raspon, listaPodataka);
+
+        } catch (Exception e) {
+            displayError("Greška pri štampi");
+        }
     }
 
     @FXML
